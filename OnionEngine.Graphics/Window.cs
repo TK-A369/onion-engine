@@ -6,15 +6,97 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
+	struct VerticesIndices
+	{
+		public List<float> vertices;
+		public List<int> indices;
+	}
+
+	class RenderGroup : IDisposable
+	{
+		// OpenGL stuff
+		public int vertexArrayObject;
+		public int vertexBufferObject;
+		public int elementBufferObject;
+
+		public string shader;
+
+		// If OpenGL buffers were disposed
+		private bool disposed = false;
+
+		private List<float> vertices = new List<float>();
+		private List<int> indices = new List<int>();
+
+		public RenderGroup(string _shader)
+		{
+			shader = _shader;
+
+			// Generate OpenGL buffers
+			vertexArrayObject = GL.GenVertexArray();
+			vertexBufferObject = GL.GenBuffer();
+			elementBufferObject = GL.GenBuffer();
+
+			// Bind those buffers
+			Bind();
+
+			// Configure VAO
+			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+			GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+			GL.EnableVertexAttribArray(0);
+			GL.EnableVertexAttribArray(1);
+		}
+
+		~RenderGroup()
+		{
+			if (disposed == false)
+			{
+				Console.WriteLine("GPU Resource leak! Did you forget to call Dispose()?");
+			}
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposed)
+			{
+				GL.DeleteVertexArray(vertexArrayObject);
+				GL.DeleteBuffer(vertexBufferObject);
+				GL.DeleteBuffer(elementBufferObject);
+
+				disposed = true;
+			}
+		}
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		public void Bind()
+		{
+			GL.BindVertexArray(vertexArrayObject);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
+		}
+
+		public void Render()
+		{
+
+		}
+	}
+
 	class Window : GameWindow
 	{
-		private bool disposed;
+		// OpenGL stuff
+		private bool disposed = false;
 		private int vertexArrayObject;
 		private int vertexBufferObject;
 
+		// Shaders
 		Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
 
-		public Window(int width, int height, string title)
+		GameManager gameManager;
+
+		public Window(int width, int height, string title, GameManager _gameManager)
 			: base(
 				new GameWindowSettings(),
 				new NativeWindowSettings()
@@ -22,7 +104,9 @@ namespace OnionEngine.Graphics
 					Size = new OpenTK.Mathematics.Vector2i(width, height),
 					Title = title
 				})
-		{ }
+		{
+			gameManager = _gameManager;
+		}
 
 		protected override void Dispose(bool disposing)
 		{
@@ -130,6 +214,11 @@ namespace OnionEngine.Graphics
 
 			Context.SwapBuffers();
 			base.OnUpdateFrame(e);
+		}
+
+		protected override void OnRenderFrame(FrameEventArgs args)
+		{
+			base.OnRenderFrame(args);
 		}
 	}
 }

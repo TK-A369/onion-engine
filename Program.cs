@@ -7,10 +7,6 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine
 {
-	class RenderComponent : Component
-	{
-
-	}
 	class RigidBodyComponent : Component
 	{
 
@@ -54,7 +50,7 @@ namespace OnionEngine
 				Console.WriteLine(" matches query");
 			}
 
-			using (Window win = new Window(800, 600, "Onion engine demo"))
+			using (Window win = new Window(800, 600, "Onion engine demo", gameManager))
 			{
 				win.Run();
 			}
