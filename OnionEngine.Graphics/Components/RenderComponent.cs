@@ -4,24 +4,25 @@ namespace OnionEngine.Graphics
 {
 	sealed class RenderComponent : Component
 	{
-		public VerticesIndices GetVertices(int start_index)
+		int counter = 0;
+		public List<RenderData> GetVertices()
 		{
 			List<float> vertices = new List<float>()
 			{
-				0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-				0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-				-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f,
-				-0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+				// x        y      z      r     g     b
+                  -0.9f,   -0.9f,  0.0f,  1.0f, 0.0f, 0.0f,
+				  -0.7f,   -0.9f,  0.0f,  1.0f, 1.0f, 0.0f,
+				  -0.8f,   -0.8f,  0.0f,  0.0f, 0.0f, 1.0f,
+				  -0.7f,   -0.8f + counter * 0.001f,  0.0f,  1.0f, 1.0f, 1.0f,
 			};
 			List<int> indices = new List<int>()
 			{
-				start_index,
-				start_index + 1,
-				start_index + 2,
-				start_index + 3
+				0, 1, 2,
+				1, 2, 3
 			};
+			counter++;
 
-			return new VerticesIndices { vertices = vertices, indices = indices };
+			return new List<RenderData>() { new RenderData { vertices = vertices, indices = indices, renderGroup = "basic-group" } };
 		}
 	}
 }

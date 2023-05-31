@@ -11,10 +11,10 @@ namespace OnionEngine.Core
 		public bool debugMode = false;
 
 		// Set of entities
-		HashSet<Entity> entities = new HashSet<Entity>();
+		public HashSet<Entity> entities = new HashSet<Entity>();
 
 		// Dictionary of components by their id
-		Dictionary<Int64, Component> components = new Dictionary<Int64, Component>();
+		public Dictionary<Int64, Component> components = new Dictionary<Int64, Component>();
 
 		// Dictionary of parent entities of given components by their id
 		Dictionary<Int64, Int64> entitiesByComponent = new Dictionary<Int64, Int64>();
@@ -107,6 +107,18 @@ namespace OnionEngine.Core
 				result.IntersectWith(QueryEntitiesOwningComponents(secondHalf));
 				return result;
 			}
+		}
+
+		public Int64 GetComponent(Int64 entityId, Type componentType)
+		{
+			foreach (Int64 componentId in componentsByEntity[entityId])
+			{
+				if (components[componentId].GetType().IsAssignableTo(componentType))
+				{
+					return componentId;
+				}
+			}
+			throw new Exception("Component not found");
 		}
 	}
 }

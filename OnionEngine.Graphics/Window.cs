@@ -6,10 +6,11 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
-	struct VerticesIndices
+	struct RenderData
 	{
 		public List<float> vertices;
 		public List<int> indices;
+		public string renderGroup;
 	}
 
 	class RenderGroup : IDisposable
@@ -25,19 +26,8 @@ namespace OnionEngine.Graphics
 		private bool disposed = false;
 
 		// Data to be rendered
-		public List<float> vertices = new List<float>()
-		{
-			// x        y      z      r     g     b
-              -0.9f,   -0.9f,  0.0f,  1.0f, 0.0f, 0.0f,
-			  -0.7f,   -0.9f,  0.0f,  1.0f, 1.0f, 0.0f,
-			  -0.8f,   -0.8f,  0.0f,  0.0f, 0.0f, 1.0f,
-			  -0.7f,   -0.8f,  0.0f,  1.0f, 1.0f, 1.0f,
-		};
-		public List<int> indices = new List<int>()
-		{
-			0, 1, 2,
-			1, 2, 3
-		};
+		public List<float> vertices = new List<float>();
+		public List<int> indices = new List<int>();
 
 		public RenderGroup(Shader _shader)
 		{
@@ -93,8 +83,9 @@ namespace OnionEngine.Graphics
 		public void Render()
 		{
 			Bind();
-			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), BufferUsageHint.DynamicDraw);
-			GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.DynamicDraw);
+
+			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), BufferUsageHint.StreamDraw);
+			GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.StreamDraw);
 			shader.Use();
 			// GL.DrawArrays(PrimitiveType.Triangles, 0, triangle.Length / 6);
 			GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
@@ -112,7 +103,7 @@ namespace OnionEngine.Graphics
 		Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
 
 		// Render groups
-		List<RenderGroup> renderGroups;
+		Dictionary<string, RenderGroup> renderGroups = new Dictionary<string, RenderGroup>();
 
 		GameManager gameManager;
 
@@ -137,7 +128,7 @@ namespace OnionEngine.Graphics
 				foreach (Shader shader in shaders.Values)
 					shader.Dispose();
 
-				foreach (RenderGroup renderGroup in renderGroups)
+				foreach (RenderGroup renderGroup in renderGroups.Values)
 					renderGroup.Dispose();
 
 				GL.DeleteBuffer(vertexBufferObject);
@@ -219,9 +210,9 @@ namespace OnionEngine.Graphics
 
 			shaders["basic-shader"] = new Shader("Resources/basic_shader.vert", "Resources/basic_shader.frag");
 
-			renderGroups = new List<RenderGroup>()
+			renderGroups = new Dictionary<string, RenderGroup>()
 			{
-				new RenderGroup(shaders["basic-shader"])
+				["basic-group"] = new RenderGroup(shaders["basic-shader"])
 			};
 		}
 
@@ -234,14 +225,44 @@ namespace OnionEngine.Graphics
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			renderGroups[0].vertices[18] += (float)e.Time * 0.025f;
-			renderGroups[0].vertices[19] += (float)e.Time * 0.05f;
+			// renderGroups["basic-group"].vertices[18] += (float)e.Time * 0.025f;
+			// renderGroups["basic-group"].vertices[19] += (float)e.Time * 0.05f;
 
 			base.OnUpdateFrame(e);
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs args)
 		{
+			// Clear render groups' vertices data
+			foreach (RenderGroup renderGroup in renderGroups.Values)
+			{
+				renderGroup.vertices.Clear();
+				renderGroup.indices.Clear();
+			}
+
+			// Add vertices to appropriate render groups
+			HashSet<Int64> entitiesToRender = gameManager.QueryEntitiesOwningComponents(new HashSet<Type>() { typeof(RenderComponent) });
+			foreach (Int64 entity in entitiesToRender)
+			{
+				Int64 renderComponentId = gameManager.GetComponent(entity, typeof(RenderComponent));
+				RenderComponent renderComponent = (gameManager.components[renderComponentId] as RenderComponent) ?? throw new NullReferenceException();
+				List<RenderData> dataToRender = renderComponent.GetVertices();
+				foreach (RenderData renderData in dataToRender)
+				{
+					RenderGroup renderGroup = renderGroups[renderData.renderGroup];
+					int indexOffset = renderGroup.vertices.Count / 6;
+					foreach (float vertex in renderData.vertices)
+					{
+						renderGroup.vertices.Add(vertex);
+					}
+					foreach (int index in renderData.indices)
+					{
+						renderGroup.indices.Add(index + indexOffset);
+					}
+				}
+			}
+
+			// Clear
 			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -250,7 +271,7 @@ namespace OnionEngine.Graphics
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
-			foreach (RenderGroup renderGroup in renderGroups)
+			foreach (RenderGroup renderGroup in renderGroups.Values)
 			{
 				renderGroup.Render();
 			}
