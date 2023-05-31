@@ -19,15 +19,27 @@ namespace OnionEngine.Graphics
 		public int vertexBufferObject;
 		public int elementBufferObject;
 
-		public string shader;
+		public Shader shader;
 
 		// If OpenGL buffers were disposed
 		private bool disposed = false;
 
-		private List<float> vertices = new List<float>();
-		private List<int> indices = new List<int>();
+		// Data to be rendered
+		public List<float> vertices = new List<float>()
+		{
+			// x        y      z      r     g     b
+              -0.9f,   -0.9f,  0.0f,  1.0f, 0.0f, 0.0f,
+			  -0.7f,   -0.9f,  0.0f,  1.0f, 1.0f, 0.0f,
+			  -0.8f,   -0.8f,  0.0f,  0.0f, 0.0f, 1.0f,
+			  -0.7f,   -0.8f,  0.0f,  1.0f, 1.0f, 1.0f,
+		};
+		public List<int> indices = new List<int>()
+		{
+			0, 1, 2,
+			1, 2, 3
+		};
 
-		public RenderGroup(string _shader)
+		public RenderGroup(Shader _shader)
 		{
 			shader = _shader;
 
@@ -80,7 +92,12 @@ namespace OnionEngine.Graphics
 
 		public void Render()
 		{
-
+			Bind();
+			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), BufferUsageHint.DynamicDraw);
+			GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.DynamicDraw);
+			shader.Use();
+			// GL.DrawArrays(PrimitiveType.Triangles, 0, triangle.Length / 6);
+			GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
 		}
 	}
 
@@ -93,6 +110,9 @@ namespace OnionEngine.Graphics
 
 		// Shaders
 		Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
+
+		// Render groups
+		List<RenderGroup> renderGroups;
 
 		GameManager gameManager;
 
@@ -116,6 +136,9 @@ namespace OnionEngine.Graphics
 
 				foreach (Shader shader in shaders.Values)
 					shader.Dispose();
+
+				foreach (RenderGroup renderGroup in renderGroups)
+					renderGroup.Dispose();
 
 				GL.DeleteBuffer(vertexBufferObject);
 				GL.DeleteVertexArray(vertexArrayObject);
@@ -195,6 +218,11 @@ namespace OnionEngine.Graphics
 			// GL.UseProgram(program);
 
 			shaders["basic-shader"] = new Shader("Resources/basic_shader.vert", "Resources/basic_shader.frag");
+
+			renderGroups = new List<RenderGroup>()
+			{
+				new RenderGroup(shaders["basic-shader"])
+			};
 		}
 
 
@@ -206,18 +234,29 @@ namespace OnionEngine.Graphics
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			renderGroups[0].vertices[18] += (float)e.Time * 0.025f;
+			renderGroups[0].vertices[19] += (float)e.Time * 0.05f;
 
-			shaders["basic-shader"].Use();
-			GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-
-			Context.SwapBuffers();
 			base.OnUpdateFrame(e);
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs args)
 		{
+			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			GL.Clear(ClearBufferMask.ColorBufferBit);
+
+			shaders["basic-shader"].Use();
+			GL.BindVertexArray(vertexArrayObject);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
+			GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+
+			foreach (RenderGroup renderGroup in renderGroups)
+			{
+				renderGroup.Render();
+			}
+
+			Context.SwapBuffers();
+
 			base.OnRenderFrame(args);
 		}
 	}
