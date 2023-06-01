@@ -16,15 +16,40 @@ namespace OnionEngine
 
 	}
 
+	class TestEntitySystem : EntitySystem
+	{
+		[EntitySystemDependency]
+		public RigidBodyComponent? rigidBodyComponent;
+
+		public override void OnCreate()
+		{
+			Console.WriteLine("Creating TestEntitySystem!");
+
+			base.OnCreate();
+		}
+
+		public override void OnDestroy()
+		{
+			Console.WriteLine("Destroying TestEntitySystem!");
+
+			base.OnDestroy();
+		}
+	}
+
 	internal class Program
 	{
 		static void Main(string[] args)
 		{
 			Console.WriteLine("Hello, World!");
 
+			// Create GameManager
 			GameManager gameManager = new GameManager();
-			gameManager.debugMode = true;
+			GameManager.debugMode = true;
 
+			// Register entity systems
+			gameManager.RegisterEntitySystem(typeof(TestEntitySystem));
+
+			// Create and remove some entities and components
 			Int64 entity1 = gameManager.AddEntity("entity1");
 			Console.Write("New entity has id ");
 			Console.WriteLine(entity1);

@@ -11,7 +11,7 @@ namespace OnionEngine.Core
 		// The id that will be given for next component
 		Int64 nextComponentId = 0;
 
-		public bool debugMode = false;
+		public static bool debugMode = false;
 
 		// Set of entities
 		public HashSet<Entity> entities = new HashSet<Entity>();
@@ -43,6 +43,7 @@ namespace OnionEngine.Core
 			Int64 entityId = nextEntityId++;
 			entities.Add(new Entity() { entityId = nextEntityId, name = name });
 			componentsByEntity.Add(entityId, new HashSet<Int64>());
+			entitySystemsByParent.Add(entityId, new Dictionary<Type, EntitySystem>());
 
 			return entityId;
 		}
@@ -60,25 +61,34 @@ namespace OnionEngine.Core
 
 			// List all components (by type) currently owned by this entity
 			Dictionary<Type, Int64> ownedComponents = new Dictionary<Type, Int64>();
+			if (debugMode)
+				Console.WriteLine("Components owned by entity " + component.entityId + ":");
 			foreach (Int64 componentId2 in componentsByEntity[component.entityId])
 			{
 				ownedComponents.Add(components[componentId2].GetType(), componentId2);
+				if (debugMode)
+					Console.WriteLine(componentId2 + " " + components[componentId2].GetType().Name);
 			}
 
 			// Check if this entity should get new entity system
 			foreach (KeyValuePair<Type, Dictionary<Type, string>> entitySystemPair in registeredEntitySystems)
 			{
-				// If all components needed by system are owned by this entity
-				if (entitySystemPair.Value.Keys.ToImmutableHashSet().IsSubsetOf(ownedComponents.Keys))
+				// If all components needed by system are owned by this entity, and such system hasn't been created yet
+				if (!entitySystemsByParent[component.entityId].ContainsKey(entitySystemPair.Key))
 				{
-					// Create instance of entity system
-					EntitySystem entitySystem = Activator.CreateInstance(entitySystemPair.Key) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
-					foreach (KeyValuePair<Type, string> dependencyPair in entitySystemPair.Value)
+					if (entitySystemPair.Value.Keys.ToImmutableHashSet().IsSubsetOf(ownedComponents.Keys))
 					{
-						(entitySystemPair.Key.GetField(dependencyPair.Value) ?? throw new NullReferenceException()).SetValue(entitySystem, ownedComponents[dependencyPair.Key]);
+						if (debugMode)
+							Console.WriteLine("Creating new instance of entity system " + entitySystemPair.Key.Name);
+						// Create instance of entity system
+						EntitySystem entitySystem = Activator.CreateInstance(entitySystemPair.Key) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
+						foreach (KeyValuePair<Type, string> dependencyPair in entitySystemPair.Value)
+						{
+							(entitySystemPair.Key.GetField(dependencyPair.Value) ?? throw new NullReferenceException()).SetValue(entitySystem, components[ownedComponents[dependencyPair.Key]]);
+						}
+						entitySystemsByParent[component.entityId].Add(entitySystemPair.Key, entitySystem);
+						entitySystem.OnCreate();
 					}
-					entitySystemsByParent[component.entityId].Add(entitySystemPair.Key, entitySystem);
-					entitySystem.OnCreate();
 				}
 			}
 
@@ -87,6 +97,9 @@ namespace OnionEngine.Core
 
 		public void RemoveComponent(Int64 componentId)
 		{
+			if (debugMode)
+				Console.WriteLine("Removing component " + componentId);
+
 			// Remove entity systems which cannot live longer due to removed component
 			foreach (KeyValuePair<Type, EntitySystem> entitySystemPair in entitySystemsByParent[components[componentId].entityId])
 			{
@@ -94,6 +107,8 @@ namespace OnionEngine.Core
 				// If this entity system depends on this component
 				if (registeredEntitySystems[entitySystemType].Keys.Contains(components[componentId].GetType()))
 				{
+					if (debugMode)
+						Console.WriteLine("Destroying entity system of type " + entitySystemType.Name + " on entity " + components[componentId].entityId);
 					entitySystemPair.Value.OnDestroy();
 					entitySystemsByParent[components[componentId].entityId].Remove(entitySystemType);
 				}
