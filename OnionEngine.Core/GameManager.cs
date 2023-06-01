@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Collections.Immutable;
+
 namespace OnionEngine.Core
 {
 	sealed class GameManager
@@ -25,6 +28,12 @@ namespace OnionEngine.Core
 		// Dictionary of set of entities by set of owned components
 		Dictionary<HashSet<Type>, HashSet<Int64>> entitiesByOwnedComponentsCache = new Dictionary<HashSet<Type>, HashSet<Int64>>();
 
+		// Dictionary of registered entity systems and their dependencies set
+		Dictionary<Type, Dictionary<Type, string>> registeredEntitySystems = new Dictionary<Type, Dictionary<Type, string>>();
+
+		// Dictionary of entity systems by their type and parent entity
+		Dictionary<Int64, Dictionary<Type, EntitySystem>> entitySystemsByParent = new Dictionary<Int64, Dictionary<Type, EntitySystem>>();
+
 		public GameManager()
 		{
 		}
@@ -49,11 +58,48 @@ namespace OnionEngine.Core
 			// Consider improving it - recompute only affected queries
 			entitiesByOwnedComponentsCache.Clear();
 
+			// List all components (by type) currently owned by this entity
+			Dictionary<Type, Int64> ownedComponents = new Dictionary<Type, Int64>();
+			foreach (Int64 componentId2 in componentsByEntity[component.entityId])
+			{
+				ownedComponents.Add(components[componentId2].GetType(), componentId2);
+			}
+
+			// Check if this entity should get new entity system
+			foreach (KeyValuePair<Type, Dictionary<Type, string>> entitySystemPair in registeredEntitySystems)
+			{
+				// If all components needed by system are owned by this entity
+				if (entitySystemPair.Value.Keys.ToImmutableHashSet().IsSubsetOf(ownedComponents.Keys))
+				{
+					// Create instance of entity system
+					EntitySystem entitySystem = Activator.CreateInstance(entitySystemPair.Key) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
+					foreach (KeyValuePair<Type, string> dependencyPair in entitySystemPair.Value)
+					{
+						(entitySystemPair.Key.GetField(dependencyPair.Value) ?? throw new NullReferenceException()).SetValue(entitySystem, ownedComponents[dependencyPair.Key]);
+					}
+					entitySystemsByParent[component.entityId].Add(entitySystemPair.Key, entitySystem);
+					entitySystem.OnCreate();
+				}
+			}
+
 			return componentId;
 		}
 
 		public void RemoveComponent(Int64 componentId)
 		{
+			// Remove entity systems which cannot live longer due to removed component
+			foreach (KeyValuePair<Type, EntitySystem> entitySystemPair in entitySystemsByParent[components[componentId].entityId])
+			{
+				Type entitySystemType = entitySystemPair.Key;
+				// If this entity system depends on this component
+				if (registeredEntitySystems[entitySystemType].Keys.Contains(components[componentId].GetType()))
+				{
+					entitySystemPair.Value.OnDestroy();
+					entitySystemsByParent[components[componentId].entityId].Remove(entitySystemType);
+				}
+			}
+
+			// Remove component
 			entitiesByComponent.Remove(componentId);
 			componentsByEntity[components[componentId].entityId].Remove(componentId);
 
@@ -103,9 +149,12 @@ namespace OnionEngine.Core
 					i++;
 				}
 
-				HashSet<Int64> result = QueryEntitiesOwningComponents(firstHalf);
-				result.IntersectWith(QueryEntitiesOwningComponents(secondHalf));
-				return result;
+				HashSet<Int64> firstHalfResult = QueryEntitiesOwningComponents(firstHalf);
+				entitiesByOwnedComponentsCache.Add(firstHalf, firstHalfResult);
+				HashSet<Int64> secondHalfResult = QueryEntitiesOwningComponents(secondHalf);
+				entitiesByOwnedComponentsCache.Add(secondHalf, secondHalfResult);
+				firstHalfResult.IntersectWith(secondHalfResult);
+				return firstHalfResult;
 			}
 		}
 
@@ -119,6 +168,23 @@ namespace OnionEngine.Core
 				}
 			}
 			throw new Exception("Component not found");
+		}
+
+		public void RegisterEntitySystem(Type entitySystemType)
+		{
+			if (!entitySystemType.IsAssignableTo(typeof(EntitySystem)))
+				throw new ArgumentException("You must provide Type object representing subclass of EntitySystem");
+
+			Dictionary<Type, string> dependencies = new Dictionary<Type, string>();
+			foreach (FieldInfo fieldInfo in entitySystemType.GetFields())
+			{
+				if (fieldInfo.IsDefined(typeof(EntitySystemDependencyAttribute)))
+				{
+					dependencies.Add(fieldInfo.FieldType, fieldInfo.Name);
+				}
+			}
+
+			registeredEntitySystems.Add(entitySystemType, dependencies);
 		}
 	}
 }
