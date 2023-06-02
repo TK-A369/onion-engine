@@ -3,21 +3,21 @@
 <protos>
 	<proto name="abc">
 		<entities>
-			<entity>
+			<entity name="myent1">
 				<component type="RenderComponent"></component>
 			</entity>
 		</entities>
 	</proto>
 	<proto name="123456">
 		<entities>
-			<entity>
+			<entity name="someentity">
 				<component type="RigidBodyComponent"></component>
 			</entity>
 		</entities>
 	</proto>
 	<proto name="someproto">
 		<entities>
-			<entity>
+			<entity name="myent2">
 				<component type="RigidBodyComponent"></component>
 				<component type="CollidableComponent"></component>
 			</entity>

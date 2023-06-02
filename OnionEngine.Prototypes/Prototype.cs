@@ -2,11 +2,12 @@ namespace OnionEngine.Prototypes
 {
 	public class EntityPrototype
 	{
+		public string name = "";
 		public List<ComponentPrototype> components = new List<ComponentPrototype>();
 	}
 	public class ComponentPrototype
 	{
-		public string name = "";
+		public string type = "";
 		public Dictionary<string, object> properties = new Dictionary<string, object>();
 	}
 

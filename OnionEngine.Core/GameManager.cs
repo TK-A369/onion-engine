@@ -36,6 +36,8 @@ namespace OnionEngine.Core
 		// Dictionary of entity systems by their type and parent entity
 		Dictionary<Int64, Dictionary<Type, EntitySystem>> entitySystemsByParent = new Dictionary<Int64, Dictionary<Type, EntitySystem>>();
 
+		Dictionary<string, Type> componentTypesByName = new Dictionary<string, Type>();
+
 		// Prototype manager
 		public PrototypeManager prototypeManager = new PrototypeManager();
 
@@ -51,6 +53,25 @@ namespace OnionEngine.Core
 			entitySystemsByParent.Add(entityId, new Dictionary<Type, EntitySystem>());
 
 			return entityId;
+		}
+
+		public void RegisterComponentType(Type type)
+		{
+			if (!type.IsAssignableTo(typeof(Component)))
+				throw new ArgumentException("Type must be inherit from Component");
+
+			componentTypesByName.Add(type.Name, type);
+
+			if (debugMode)
+				Console.WriteLine("Registered component type " + type.Name);
+		}
+
+		public Component CreateComponentByTypeName(string typeName, object[] args)
+		{
+			Type componentType = componentTypesByName[typeName];
+			Component component = Activator.CreateInstance(componentType, args) as Component ?? throw new Exception("Provided type name must inherit from Component");
+
+			return component;
 		}
 
 		public Int64 AddComponent(Component component)
@@ -128,6 +149,18 @@ namespace OnionEngine.Core
 			components.Remove(componentId);
 		}
 
+		public Int64 GetComponent(Int64 entityId, Type componentType)
+		{
+			foreach (Int64 componentId in componentsByEntity[entityId])
+			{
+				if (components[componentId].GetType().IsAssignableTo(componentType))
+				{
+					return componentId;
+				}
+			}
+			throw new Exception("Component not found");
+		}
+
 		public HashSet<Int64> QueryEntitiesOwningComponents(HashSet<Type> componentTypes)
 		{
 			if (entitiesByOwnedComponentsCache.ContainsKey(componentTypes))
@@ -176,18 +209,6 @@ namespace OnionEngine.Core
 				firstHalfResult.IntersectWith(secondHalfResult);
 				return firstHalfResult;
 			}
-		}
-
-		public Int64 GetComponent(Int64 entityId, Type componentType)
-		{
-			foreach (Int64 componentId in componentsByEntity[entityId])
-			{
-				if (components[componentId].GetType().IsAssignableTo(componentType))
-				{
-					return componentId;
-				}
-			}
-			throw new Exception("Component not found");
 		}
 
 		public void RegisterEntitySystem(Type entitySystemType)
