@@ -19,7 +19,7 @@ namespace OnionEngine
 	class TestEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		public RigidBodyComponent? rigidBodyComponent;
+		public RigidBodyComponent? rigidBodyComponent = default!;
 
 		public override void OnCreate()
 		{
@@ -45,6 +45,9 @@ namespace OnionEngine
 			// Create GameManager
 			GameManager gameManager = new GameManager();
 			GameManager.debugMode = true;
+
+			// Load prototypes
+			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
 
 			// Register entity systems
 			gameManager.RegisterEntitySystem(typeof(TestEntitySystem));

@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Collections.Immutable;
 
+using OnionEngine.Prototypes;
+
 namespace OnionEngine.Core
 {
 	sealed class GameManager
@@ -33,6 +35,9 @@ namespace OnionEngine.Core
 
 		// Dictionary of entity systems by their type and parent entity
 		Dictionary<Int64, Dictionary<Type, EntitySystem>> entitySystemsByParent = new Dictionary<Int64, Dictionary<Type, EntitySystem>>();
+
+		// Prototype manager
+		public PrototypeManager prototypeManager = new PrototypeManager();
 
 		public GameManager()
 		{
