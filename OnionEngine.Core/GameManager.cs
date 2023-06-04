@@ -48,7 +48,7 @@ namespace OnionEngine.Core
 		public Int64 AddEntity(string name)
 		{
 			Int64 entityId = nextEntityId++;
-			entities.Add(new Entity() { entityId = nextEntityId, name = name });
+			entities.Add(new Entity() { entityId = entityId, name = name });
 			componentsByEntity.Add(entityId, new HashSet<Int64>());
 			entitySystemsByParent.Add(entityId, new Dictionary<Type, EntitySystem>());
 
@@ -170,6 +170,22 @@ namespace OnionEngine.Core
 				}
 			}
 			throw new Exception("Component not found");
+		}
+
+		public string DumpEntitiesAndComponents()
+		{
+			string result = "";
+
+			foreach (Entity entity in entities)
+			{
+				result += "Entity " + entity.entityId + " \"" + entity.name + "\":\n";
+				foreach (Int64 componentId in componentsByEntity[entity.entityId])
+				{
+					result += "  Component " + componentId + " " + components[componentId].GetType().Name + "\n";
+				}
+			}
+
+			return result;
 		}
 
 		public HashSet<Int64> QueryEntitiesOwningComponents(HashSet<Type> componentTypes)

@@ -78,6 +78,9 @@ namespace OnionEngine
 			Console.Write("New CollidableComponent has id ");
 			Console.WriteLine(collidableComponent);
 
+			Console.WriteLine();
+			Console.WriteLine(gameManager.DumpEntitiesAndComponents());
+
 			gameManager.RemoveComponent(rigidBodyComponent);
 
 			Console.WriteLine();
