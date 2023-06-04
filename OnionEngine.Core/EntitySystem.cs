@@ -8,5 +8,7 @@ namespace OnionEngine.Core
 		public virtual void OnDestroy() { }
 	}
 
+	public class EntitySystemAttribute : Attribute { }
+
 	public class EntitySystemDependencyAttribute : Attribute { }
 }

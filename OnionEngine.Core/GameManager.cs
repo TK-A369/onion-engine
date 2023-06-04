@@ -66,6 +66,17 @@ namespace OnionEngine.Core
 				Console.WriteLine("Registered component type " + type.Name);
 		}
 
+		public void AutoRegisterComponentTypes()
+		{
+			IEnumerable<Type> componentTypes = from assembly in AppDomain.CurrentDomain.GetAssemblies()
+											   from type in assembly.GetTypes()
+											   where type.IsDefined(typeof(ComponentAttribute))
+											   select type;
+
+			foreach (Type componentType in componentTypes)
+				RegisterComponentType(componentType);
+		}
+
 		public Component CreateComponentByTypeName(string typeName, object[] args)
 		{
 			Type componentType = componentTypesByName[typeName];
@@ -211,7 +222,7 @@ namespace OnionEngine.Core
 			}
 		}
 
-		public void RegisterEntitySystem(Type entitySystemType)
+		public void RegisterEntitySystemType(Type entitySystemType)
 		{
 			if (!entitySystemType.IsAssignableTo(typeof(EntitySystem)))
 				throw new ArgumentException("You must provide Type object representing subclass of EntitySystem");
@@ -226,6 +237,20 @@ namespace OnionEngine.Core
 			}
 
 			registeredEntitySystems.Add(entitySystemType, dependencies);
+
+			if (debugMode)
+				Console.WriteLine("Registered entity system type " + entitySystemType.Name);
+		}
+
+		public void AutoRegisterEntitySystemTypes()
+		{
+			IEnumerable<Type> entitySystemTypes = from assembly in AppDomain.CurrentDomain.GetAssemblies()
+												  from type in assembly.GetTypes()
+												  where type.IsDefined(typeof(EntitySystemAttribute))
+												  select type;
+
+			foreach (Type entitySystemType in entitySystemTypes)
+				RegisterEntitySystemType(entitySystemType);
 		}
 	}
 }

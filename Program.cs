@@ -1,4 +1,4 @@
-﻿using OnionEngine.Core;
+using OnionEngine.Core;
 using OnionEngine.Graphics;
 
 using OpenTK.Graphics.OpenGL4;
@@ -7,15 +7,18 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine
 {
+	[Component]
 	class RigidBodyComponent : Component
 	{
 
 	}
+	[Component]
 	class CollidableComponent : Component
 	{
 
 	}
 
+	[EntitySystem]
 	class TestEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
@@ -46,11 +49,17 @@ namespace OnionEngine
 			GameManager gameManager = new GameManager();
 			GameManager.debugMode = true;
 
-			// Load prototypes
-			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
+			// Register component types
+			gameManager.AutoRegisterComponentTypes();
+			Console.WriteLine();
 
 			// Register entity systems
-			gameManager.RegisterEntitySystem(typeof(TestEntitySystem));
+			gameManager.AutoRegisterEntitySystemTypes();
+			Console.WriteLine();
+
+			// Load prototypes
+			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
+			Console.WriteLine();
 
 			// Create and remove some entities and components
 			Int64 entity1 = gameManager.AddEntity("entity1");
@@ -70,6 +79,8 @@ namespace OnionEngine
 			Console.WriteLine(collidableComponent);
 
 			gameManager.RemoveComponent(rigidBodyComponent);
+
+			Console.WriteLine();
 
 			foreach (Int64 entity in gameManager.QueryEntitiesOwningComponents(new HashSet<Type> { typeof(RenderComponent), typeof(CollidableComponent) }))
 			{

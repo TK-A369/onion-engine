@@ -2,6 +2,7 @@ using OnionEngine.Core;
 
 namespace OnionEngine.Graphics
 {
+	[Component]
 	sealed class RenderComponent : Component
 	{
 		int counter = 0;
