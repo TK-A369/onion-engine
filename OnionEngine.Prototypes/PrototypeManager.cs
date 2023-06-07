@@ -19,18 +19,17 @@ namespace OnionEngine.Prototypes
 				Console.WriteLine("Registering prototype: " + prototypeName);
 				foreach (XmlNode entityNode in prototypeNode.SelectNodes("./entities/entity") ?? throw new Exception("Prototype XML error"))
 				{
-					EntityPrototype entityPrototype = new EntityPrototype();
+					List<ComponentPrototype> componentPrototypes = new List<ComponentPrototype>();
 					string entityName = ((entityNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
 					Console.WriteLine("  Entity with components:");
 					foreach (XmlNode componentNode in entityNode.SelectNodes("./component") ?? throw new Exception("Prototype XML error"))
 					{
-						ComponentPrototype componentPrototype = new ComponentPrototype();
 						string prototypeType = ((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).Value;
-						componentPrototype.type = prototypeType;
 						Console.WriteLine("    " + prototypeType);
-						entityPrototype.components.Add(componentPrototype);
+						ComponentPrototype componentPrototype = new ComponentPrototype(prototypeType);
+						componentPrototypes.Add(componentPrototype);
 					}
-					prototype.entityList.Add(entityPrototype);
+					prototype.entityList.Add(new EntityPrototype(entityName, componentPrototypes));
 				}
 				prototypes.Add(prototypeName, prototype);
 			}
