@@ -13,6 +13,13 @@ namespace OnionEngine.Graphics
 		public string renderGroup;
 	}
 
+	public struct VertexAttributeDescriptor
+	{
+		public VertexAttribPointerType type;
+		public int valuesCount;
+		public bool normalized;
+	}
+
 	class RenderGroup : IDisposable
 	{
 		// OpenGL stuff
@@ -20,7 +27,11 @@ namespace OnionEngine.Graphics
 		public int vertexBufferObject;
 		public int elementBufferObject;
 
+		// Shader object
 		public Shader shader;
+
+		// Vertex attributes descriptors
+		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new List<VertexAttributeDescriptor>();
 
 		// If OpenGL buffers were disposed
 		private bool disposed = false;
@@ -29,9 +40,10 @@ namespace OnionEngine.Graphics
 		public List<float> vertices = new List<float>();
 		public List<int> indices = new List<int>();
 
-		public RenderGroup(Shader _shader)
+		public RenderGroup(Shader _shader, List<VertexAttributeDescriptor> _vertexAttributesDescriptors)
 		{
 			shader = _shader;
+			vertexAttributesDescriptors = _vertexAttributesDescriptors;
 
 			// Generate OpenGL buffers
 			vertexArrayObject = GL.GenVertexArray();
@@ -42,10 +54,46 @@ namespace OnionEngine.Graphics
 			Bind();
 
 			// Configure VAO
-			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-			GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-			GL.EnableVertexAttribArray(0);
-			GL.EnableVertexAttribArray(1);
+			// Firstly, calculate sizes of attributes
+			int totalAttributesSizePerVertex = 0;
+			List<int> attributesSizes = new List<int>();
+			foreach (VertexAttributeDescriptor desc in vertexAttributesDescriptors)
+			{
+				int attributeSize = 0;
+				switch (desc.type)
+				{
+					case VertexAttribPointerType.Float:
+						attributeSize = sizeof(float) * desc.valuesCount;
+						break;
+					case VertexAttribPointerType.Double:
+						attributeSize = sizeof(double) * desc.valuesCount;
+						break;
+					case VertexAttribPointerType.Byte:
+						attributeSize = sizeof(byte) * desc.valuesCount;
+						break;
+					case VertexAttribPointerType.UnsignedByte:
+						attributeSize = sizeof(byte) * desc.valuesCount;
+						break;
+					case VertexAttribPointerType.Int:
+						attributeSize = sizeof(int) * desc.valuesCount;
+						break;
+					case VertexAttribPointerType.UnsignedInt:
+						attributeSize = sizeof(uint) * desc.valuesCount;
+						break;
+				}
+				attributesSizes.Add(attributeSize);
+				totalAttributesSizePerVertex += attributeSize;
+			}
+			// Then write those values to VAO
+			int i = 0;
+			int attributesSizeUntilNow = 0;
+			foreach (VertexAttributeDescriptor desc in vertexAttributesDescriptors)
+			{
+				GL.VertexAttribPointer(i, desc.valuesCount, desc.type, desc.normalized, totalAttributesSizePerVertex, attributesSizeUntilNow);
+				GL.EnableVertexAttribArray(i);
+				attributesSizeUntilNow += attributesSizes[i];
+				i++;
+			}
 		}
 
 		~RenderGroup()
@@ -159,60 +207,17 @@ namespace OnionEngine.Graphics
 			GL.EnableVertexAttribArray(0);
 			GL.EnableVertexAttribArray(1);
 
-			// string vertexShaderCode = @"#version 330 core
-			// layout (location = 0) in vec4 a_pos;
-			// layout (location = 1) in vec4 a_color;
-
-			// out vec4 v_color;
-
-			// void main()
-			// {
-			//     v_color     = a_color;
-			//     gl_Position = a_pos; 
-			// }";
-
-			// string fragmentShaderCode = @"#version 330 core
-			// out vec4 frag_color;
-			// in  vec4 v_color;
-
-			// void main()
-			// {
-			//     frag_color = v_color; 
-			// }";
-
-			// int vertexShader = GL.CreateShader(ShaderType.VertexShader);
-			// GL.ShaderSource(vertexShader, vertexShaderCode);
-			// GL.CompileShader(vertexShader);
-			// string info_log_vertex = GL.GetShaderInfoLog(vertexShader);
-			// if (!string.IsNullOrEmpty(info_log_vertex))
-			// 	Console.WriteLine(info_log_vertex);
-
-			// int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-			// GL.ShaderSource(fragmentShader, fragmentShaderCode);
-			// GL.CompileShader(fragmentShader);
-			// string infoLogFragment = GL.GetShaderInfoLog(fragmentShader);
-			// if (!string.IsNullOrEmpty(infoLogFragment))
-			// 	Console.WriteLine(infoLogFragment);
-
-			// program = GL.CreateProgram();
-			// GL.AttachShader(program, vertexShader);
-			// GL.AttachShader(program, fragmentShader);
-			// GL.LinkProgram(program);
-			// string infoLogProgram = GL.GetProgramInfoLog(program);
-			// if (!string.IsNullOrEmpty(infoLogProgram))
-			// 	Console.WriteLine(infoLogProgram);
-			// GL.DetachShader(program, vertexShader);
-			// GL.DetachShader(program, fragmentShader);
-			// GL.DeleteShader(vertexShader);
-			// GL.DeleteShader(fragmentShader);
-
-			// GL.UseProgram(program);
-
 			shaders["basic-shader"] = new Shader("Resources/basic_shader.vert", "Resources/basic_shader.frag");
 
 			renderGroups = new Dictionary<string, RenderGroup>()
 			{
-				["basic-group"] = new RenderGroup(shaders["basic-shader"])
+				["basic-group"] = new RenderGroup(
+					shaders["basic-shader"],
+					new List<VertexAttributeDescriptor>()
+					{
+						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false },
+						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false }
+					})
 			};
 		}
 
