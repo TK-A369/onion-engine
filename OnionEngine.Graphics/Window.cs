@@ -157,11 +157,16 @@ namespace OnionEngine.Graphics
 
 		public Window(int width, int height, string title, GameManager _gameManager)
 			: base(
-				new GameWindowSettings(),
+				new GameWindowSettings()
+				{
+					RenderFrequency = 30,
+					UpdateFrequency = 30
+				},
 				new NativeWindowSettings()
 				{
 					Size = new OpenTK.Mathematics.Vector2i(width, height),
-					Title = title
+					Title = title,
+					Vsync = VSyncMode.On
 				})
 		{
 			gameManager = _gameManager;

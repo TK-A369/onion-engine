@@ -1,5 +1,6 @@
 using OnionEngine.Core;
 using OnionEngine.Graphics;
+using OnionEngine.Physics;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -7,11 +8,6 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine
 {
-	[Component]
-	class RigidBodyComponent : Component
-	{
-
-	}
 	[Component]
 	class CollidableComponent : Component
 	{
