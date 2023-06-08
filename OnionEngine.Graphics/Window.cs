@@ -6,7 +6,7 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
-	struct RenderData
+	public struct RenderData
 	{
 		public List<float> vertices;
 		public List<int> indices;
