@@ -3,6 +3,10 @@ using OnionEngine.DataTypes;
 
 namespace OnionEngine.Physics
 {
+	/// <summary>
+	/// Component representing physical body, which has velocity and mass.
+	/// Entities having this should also have <c>PositionComponent</c>.
+	/// </summary>
 	[Component]
 	sealed class PhysicalBodyComponent : Component
 	{

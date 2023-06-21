@@ -2,6 +2,9 @@ using OnionEngine.Core;
 
 namespace OnionEngine.Graphics
 {
+	/// <summary>
+	/// Component containing data about image to render.
+	/// </summary>
 	[Component]
 	sealed class RenderComponent : Component
 	{

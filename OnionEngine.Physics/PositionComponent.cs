@@ -3,6 +3,9 @@ using OnionEngine.DataTypes;
 
 namespace OnionEngine.Physics
 {
+	/// <summary>
+	/// Component storing position of object.
+	/// </summary>
 	[Component]
 	sealed class PositionComponent : Component
 	{

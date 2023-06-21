@@ -1,5 +1,11 @@
 namespace OnionEngine.Prototypes
 {
+	/// <summary>
+	/// Prototype describing one entity and its components.
+	/// It does not describe entity systems. They are created automatically if all dependencies are satisfied.
+	/// Such prototype can also inherit from other entity prototypes.
+	/// The name will be overriden. Components from both parent and child prototype will be added to entity.
+	/// </summary>
 	public class EntityPrototype
 	{
 		public string name = "";
@@ -24,6 +30,11 @@ namespace OnionEngine.Prototypes
 	}
 
 
+	/// <summary>
+	/// Prototype describing one component.
+	/// It has its type and properties.
+	/// As for now, component prototypes don't support inheritance.
+	/// </summary>
 	public class ComponentPrototype
 	{
 		public string type = "";
@@ -40,6 +51,11 @@ namespace OnionEngine.Prototypes
 		}
 	}
 
+	/// <summary>
+	/// Class describing prototype parameter.
+	/// It can have following types: number, bool, string or internal reference.
+	/// Internal reference means reference to entity or component inside this prototype. Currently WIP.
+	/// </summary>
 	public class PrototypeParameter
 	{
 		ParameterType type;
@@ -57,6 +73,9 @@ namespace OnionEngine.Prototypes
 		}
 	}
 
+	/// <summary>
+	/// Prototype describing many entities.
+	/// </summary>
 	public class Prototype
 	{
 		public List<EntityPrototype> entityList = new List<EntityPrototype>();

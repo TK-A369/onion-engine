@@ -4,6 +4,9 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
+	/// <summary>
+	/// Class managing pair of vertex shader and fragment shader.
+	/// </summary>
 	public class Shader : IDisposable
 	{
 		int handle;

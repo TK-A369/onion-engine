@@ -2,6 +2,9 @@ using OnionEngine.Core;
 
 namespace OnionEngine.Physics
 {
+	/// <summary>
+	/// Entity system that moves physical bodies.
+	/// </summary>
 	[EntitySystem]
 	class PhysicalBodyEntitySystem : EntitySystem
 	{

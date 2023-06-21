@@ -6,6 +6,11 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
+	/// <summary>
+	/// Struct storing some data to render.
+	/// It has list of vertices, and the order to draw them.
+	/// It belongs to given render group.
+	/// </summary>
 	public struct RenderData
 	{
 		public List<float> vertices;
@@ -13,6 +18,10 @@ namespace OnionEngine.Graphics
 		public string renderGroup;
 	}
 
+	/// <summary>
+	/// Struct describing vertex attributes.
+	/// For example position is usually float*3 or float*2.
+	/// </summary>
 	public struct VertexAttributeDescriptor
 	{
 		public VertexAttribPointerType type;
@@ -20,24 +29,54 @@ namespace OnionEngine.Graphics
 		public bool normalized;
 	}
 
+	/// <summary>
+	/// Render group, which has given list of vertex attributes, and uses given shader.
+	/// </summary>
 	class RenderGroup : IDisposable
 	{
 		// OpenGL stuff
+
+		/// <summary>
+		/// Handle to VAO.
+		/// It stores informations about vertex attributes and their layout.
+		/// </summary>
 		public int vertexArrayObject;
+
+		/// <summary>
+		/// Handle to VBO.
+		/// It stores informations about vertices.
+		/// </summary>
 		public int vertexBufferObject;
+
+		/// <summary>
+		/// Handle to EBO.
+		/// It stores informations about order of vertices.
+		/// </summary>
 		public int elementBufferObject;
 
-		// Shader object
+		/// <summary>
+		/// Shader object, used by this render group.
+		/// </summary>
 		public Shader shader;
 
-		// Vertex attributes descriptors
+		/// <summary>
+		/// List of vertex attributes descriptors
+		/// </summary>
 		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new List<VertexAttributeDescriptor>();
 
-		// If OpenGL buffers were disposed
+		/// <summary>
+		/// If OpenGL buffers were disposed
+		/// </summary>
 		private bool disposed = false;
 
-		// Data to be rendered
+		/// <summary>
+		/// Vertices data to be rendered
+		/// </summary>
 		public List<float> vertices = new List<float>();
+
+		/// <summary>
+		/// Order of vertices
+		/// </summary>
 		public List<int> indices = new List<int>();
 
 		public RenderGroup(Shader _shader, List<VertexAttributeDescriptor> _vertexAttributesDescriptors)
@@ -121,6 +160,9 @@ namespace OnionEngine.Graphics
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Bind VAO, VBO and EBO, so they will be used in subsequent operations.
+		/// </summary>
 		public void Bind()
 		{
 			GL.BindVertexArray(vertexArrayObject);
@@ -128,6 +170,9 @@ namespace OnionEngine.Graphics
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
 		}
 
+		/// <summary>
+		/// Render image, based on <c>vertives</c>, <c>indices</c> and <c>shader</c>.
+		/// </summary>
 		public void Render()
 		{
 			Bind();
@@ -140,19 +185,49 @@ namespace OnionEngine.Graphics
 		}
 	}
 
+	/// <summary>
+	/// Game window, rendering graphics and executing logic.
+	/// </summary>
 	class Window : GameWindow
 	{
 		// OpenGL stuff
+
+		/// <summary>
+		/// If OpenGL stuff has been disposed.
+		/// </summary>
 		private bool disposed = false;
+
+		/// <summary>
+		/// Handle to VAO.
+		/// It stores informations about vertex attributes and their layout.
+		/// </summary>
+		/// <remarks>
+		/// To be deleted. Instead, render groups will be used.
+		/// </remarks>
 		private int vertexArrayObject;
+
+		/// <summary>
+		/// Handle to VBO.
+		/// It stores informations about vertices
+		/// </summary>
+		/// <remarks>
+		/// To be deleted. Instead, render groups will be used.
+		/// </remarks>
 		private int vertexBufferObject;
 
-		// Shaders
+		/// <summary>
+		/// Dictionary of shaders by their names.
+		/// </summary>
 		Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
 
-		// Render groups
+		/// <summary>
+		/// Dictionary of render groups by their names.
+		/// </summary>
 		Dictionary<string, RenderGroup> renderGroups = new Dictionary<string, RenderGroup>();
 
+		/// <summary>
+		/// <c>GameManager</c> object used by this window.
+		/// </summary>
 		GameManager gameManager;
 
 		public Window(int width, int height, string title, GameManager _gameManager)
@@ -212,7 +287,7 @@ namespace OnionEngine.Graphics
 			GL.EnableVertexAttribArray(0);
 			GL.EnableVertexAttribArray(1);
 
-			shaders["basic-shader"] = new Shader("Resources/basic_shader.vert", "Resources/basic_shader.frag");
+			shaders["basic-shader"] = new Shader("Resources/Shaders/basic_shader.vert", "Resources/Shaders/basic_shader.frag");
 
 			renderGroups = new Dictionary<string, RenderGroup>()
 			{

@@ -4,10 +4,21 @@ using OnionEngine.Core;
 
 namespace OnionEngine.Prototypes
 {
+	/// <summary>
+	/// Class managing prototypes of entities.
+	/// </summary>
 	class PrototypeManager
 	{
+		/// <summary>
+		/// Dictionary of prototypes by their names.
+		/// </summary>
 		Dictionary<string, Prototype> prototypes = new Dictionary<string, Prototype>();
 
+		/// <summary>
+		/// Load prototype from XML.
+		/// </summary>
+		/// <param name="xmlPrototype"><c>string</c> containing XML describing the prototype.</param>
+		/// <exception cref="Exception"></exception>
 		public void LoadPrototypes(string xmlPrototype)
 		{
 			XmlDocument doc = new XmlDocument();
@@ -35,6 +46,12 @@ namespace OnionEngine.Prototypes
 			}
 		}
 
+		/// <summary>
+		/// Spawn prototype.
+		/// </summary>
+		/// <param name="gameManager"><c>GameManager</c> to spawn the prototype in</param>
+		/// <param name="prototypeName">Name of prototype to spawn</param>
+		/// <returns></returns>
 		public List<Int64> SpawnPrototype(GameManager gameManager, string prototypeName)
 		{
 			Prototype prototype = prototypes[prototypeName];
