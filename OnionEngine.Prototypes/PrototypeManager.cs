@@ -7,7 +7,7 @@ namespace OnionEngine.Prototypes
 	/// <summary>
 	/// Class managing prototypes of entities.
 	/// </summary>
-	class PrototypeManager
+	public class PrototypeManager
 	{
 		/// <summary>
 		/// Dictionary of prototypes by their names.

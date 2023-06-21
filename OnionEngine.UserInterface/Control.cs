@@ -6,7 +6,7 @@ namespace OnionEngine.UserInterface
 	/// <summary>
 	/// Base class of all UI controls.
 	/// </summary>
-	abstract class Control
+	public abstract class Control
 	{
 		/// <summary>
 		/// Parent of this control.

@@ -2,7 +2,7 @@ using OnionEngine.Graphics;
 
 namespace OnionEngine.UserInterface
 {
-	class RootControl : Control
+	public class RootControl : Control
 	{
 		public override UIDim2 Position
 		{

@@ -6,7 +6,7 @@ namespace OnionEngine.Graphics
 	/// Component containing data about image to render.
 	/// </summary>
 	[Component]
-	sealed class RenderComponent : Component
+	public sealed class RenderComponent : Component
 	{
 		int counter = 0;
 		public List<RenderData> GetVertices()

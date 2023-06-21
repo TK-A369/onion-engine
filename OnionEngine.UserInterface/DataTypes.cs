@@ -2,7 +2,7 @@ using OnionEngine.DataTypes;
 
 namespace OnionEngine.UserInterface
 {
-	struct UIDim1
+	public struct UIDim1
 	{
 		int absolutePx;
 		float relativePercent;
@@ -19,7 +19,7 @@ namespace OnionEngine.UserInterface
 		}
 	}
 
-	struct UIDim2
+	public struct UIDim2
 	{
 		int absolutePxX;
 		float relativePercentX;

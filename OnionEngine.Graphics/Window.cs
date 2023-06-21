@@ -32,7 +32,7 @@ namespace OnionEngine.Graphics
 	/// <summary>
 	/// Render group, which has given list of vertex attributes, and uses given shader.
 	/// </summary>
-	class RenderGroup : IDisposable
+	public class RenderGroup : IDisposable
 	{
 		// OpenGL stuff
 
@@ -188,7 +188,7 @@ namespace OnionEngine.Graphics
 	/// <summary>
 	/// Game window, rendering graphics and executing logic.
 	/// </summary>
-	class Window : GameWindow
+	public class Window : GameWindow
 	{
 		// OpenGL stuff
 

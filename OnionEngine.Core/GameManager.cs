@@ -10,7 +10,7 @@ namespace OnionEngine.Core
 	/// Is allows creation and removal of entites and components.
 	/// It automatically creates and destroys entity systems when appropriate.
 	/// </summary>
-	sealed class GameManager
+	public sealed class GameManager
 	{
 		/// <summary>
 		/// The id that will be given for next entity 

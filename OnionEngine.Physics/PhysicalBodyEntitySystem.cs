@@ -6,7 +6,7 @@ namespace OnionEngine.Physics
 	/// Entity system that moves physical bodies.
 	/// </summary>
 	[EntitySystem]
-	class PhysicalBodyEntitySystem : EntitySystem
+	public class PhysicalBodyEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
 		public PositionComponent positionComponent = default!;
