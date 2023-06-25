@@ -43,6 +43,22 @@ namespace OnionEngine.UserInterface
 		/// Generate render data.
 		/// </summary>
 		/// <returns>List of <see cref="RenderData" /> objects.</returns>
-		public abstract List<RenderData> Render();
+		public abstract List<RenderData> RenderThis();
+
+		public List<RenderData> Render()
+		{
+			List<RenderData> result = new List<RenderData>();
+
+			// Render itself
+			result.AddRange(RenderThis());
+
+			// Render children
+			foreach (Control child in children)
+			{
+				result.AddRange(child.Render());
+			}
+
+			return result;
+		}
 	}
 }

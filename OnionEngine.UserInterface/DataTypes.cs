@@ -5,9 +5,9 @@ namespace OnionEngine.UserInterface
 	public struct UIDim1
 	{
 		int absolutePx;
-		float relativePercent;
+		double relativePercent;
 
-		public UIDim1(int _absolutePx, float _relativePercent)
+		public UIDim1(int _absolutePx, double _relativePercent)
 		{
 			absolutePx = _absolutePx;
 			relativePercent = _relativePercent;
@@ -22,11 +22,11 @@ namespace OnionEngine.UserInterface
 	public struct UIDim2
 	{
 		int absolutePxX;
-		float relativePercentX;
+		double relativePercentX;
 		int absolutePxY;
-		float relativePercentY;
+		double relativePercentY;
 
-		public UIDim2(int _absolutePxX, float _relativePercentX, int _absolutePxY, float _relativePercentY)
+		public UIDim2(int _absolutePxX, double _relativePercentX, int _absolutePxY, double _relativePercentY)
 		{
 			absolutePxX = _absolutePxX;
 			relativePercentX = _relativePercentX;

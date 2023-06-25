@@ -10,9 +10,9 @@ namespace OnionEngine.UserInterface
 			set { position = value; }
 		}
 
-		public override List<RenderData> Render()
+		public override List<RenderData> RenderThis()
 		{
-			throw new NotImplementedException();
+			return new List<RenderData>() { };
 		}
 	}
 }
