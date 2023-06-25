@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Collections.Immutable;
 
 using OnionEngine.Prototypes;
+using OnionEngine.IoC;
 
 namespace OnionEngine.Core
 {
@@ -68,6 +69,7 @@ namespace OnionEngine.Core
 
 		public GameManager()
 		{
+			IoCManager.RegisterInstance(this);
 		}
 
 		/// <summary>
