@@ -1,6 +1,7 @@
 using System.Xml;
 
 using OnionEngine.Core;
+using OnionEngine.IoC;
 
 namespace OnionEngine.Prototypes
 {
@@ -9,6 +10,14 @@ namespace OnionEngine.Prototypes
 	/// </summary>
 	public class PrototypeManager
 	{
+		public PrototypeManager()
+		{
+			IoCManager.RegisterInstance(this);
+		}
+
+		[Dependency]
+		private GameManager gameManager = default!;
+
 		/// <summary>
 		/// Dictionary of prototypes by their names.
 		/// </summary>
@@ -52,7 +61,7 @@ namespace OnionEngine.Prototypes
 		/// <param name="gameManager"><c>GameManager</c> to spawn the prototype in</param>
 		/// <param name="prototypeName">Name of prototype to spawn</param>
 		/// <returns></returns>
-		public List<Int64> SpawnPrototype(GameManager gameManager, string prototypeName)
+		public List<Int64> SpawnPrototype(string prototypeName)
 		{
 			Prototype prototype = prototypes[prototypeName];
 

@@ -7,9 +7,9 @@ namespace OnionEngine.UserInterface
 	public sealed class UserInterfaceRendererEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		public RenderComponent renderComponent = default!;
+		RenderComponent renderComponent = default!;
 
 		[EntitySystemDependency]
-		public UserInterfaceComponent userInterfaceComponent = default!;
+		UserInterfaceComponent userInterfaceComponent = default!;
 	}
 }

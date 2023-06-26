@@ -9,9 +9,9 @@ namespace OnionEngine.Physics
 	public class PhysicalBodyEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		public PositionComponent positionComponent = default!;
+		PositionComponent positionComponent = default!;
 
 		[EntitySystemDependency]
-		public RigidBodyComponent rigidBodyComponent = default!;
+		RigidBodyComponent rigidBodyComponent = default!;
 	}
 }

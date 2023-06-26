@@ -65,11 +65,13 @@ namespace OnionEngine.Core
 		/// <summary>
 		/// Prototype manager
 		/// </summary>
-		public PrototypeManager prototypeManager = new PrototypeManager();
+		public PrototypeManager prototypeManager;
 
 		public GameManager()
 		{
 			IoCManager.RegisterInstance(this);
+
+			prototypeManager = IoCManager.CreateInstance<PrototypeManager>(new object[] { });
 		}
 
 		/// <summary>
@@ -177,7 +179,7 @@ namespace OnionEngine.Core
 						EntitySystem entitySystem = Activator.CreateInstance(entitySystemPair.Key) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
 						foreach (KeyValuePair<Type, string> dependencyPair in entitySystemPair.Value)
 						{
-							(entitySystemPair.Key.GetField(dependencyPair.Value) ?? throw new NullReferenceException()).SetValue(entitySystem, components[ownedComponents[dependencyPair.Key]]);
+							(entitySystemPair.Key.GetField(dependencyPair.Value, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new NullReferenceException()).SetValue(entitySystem, components[ownedComponents[dependencyPair.Key]]);
 						}
 						entitySystemsByParent[component.entityId].Add(entitySystemPair.Key, entitySystem);
 						entitySystem.OnCreate();
@@ -327,7 +329,7 @@ namespace OnionEngine.Core
 				throw new ArgumentException("You must provide Type object representing subclass of EntitySystem");
 
 			Dictionary<Type, string> dependencies = new Dictionary<Type, string>();
-			foreach (FieldInfo fieldInfo in entitySystemType.GetFields())
+			foreach (FieldInfo fieldInfo in entitySystemType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
 			{
 				if (fieldInfo.IsDefined(typeof(EntitySystemDependencyAttribute)))
 				{

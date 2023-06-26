@@ -18,7 +18,7 @@ namespace OnionEngine
 	class TestEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		public RigidBodyComponent? rigidBodyComponent = default!;
+		RigidBodyComponent? rigidBodyComponent = default!;
 
 		public override void OnCreate()
 		{
@@ -41,9 +41,11 @@ namespace OnionEngine
 		{
 			Console.WriteLine("Hello, World!");
 
+			// Turn on debug mode
+			GameManager.debugMode = true;
+
 			// Create GameManager
 			GameManager gameManager = new GameManager();
-			GameManager.debugMode = true;
 
 			// Register component types
 			gameManager.AutoRegisterComponentTypes();
