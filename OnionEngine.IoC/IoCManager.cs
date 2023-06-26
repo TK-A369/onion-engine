@@ -87,7 +87,10 @@ namespace OnionEngine.IoC
 				if (fieldInfo.IsDefined(typeof(DependencyAttribute)))
 				{
 					fieldInfo.SetValue(instance, GetInstanceOfType(fieldInfo.FieldType) ?? throw new Exception("Couldn't find instance of type " + fieldInfo.FieldType.FullName));
-					Console.WriteLine("Dependency injected: " + fieldInfo.FieldType.FullName + " -> " + fieldInfo.Name);
+					Console.WriteLine(
+						"Dependency " + fieldInfo.FieldType.FullName +
+						" injected to field " + fieldInfo.Name +
+						" in instance of type " + instance.GetType().FullName);
 				}
 			}
 		}

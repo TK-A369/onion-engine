@@ -1,4 +1,5 @@
 using OnionEngine.Core;
+using OnionEngine.IoC;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -225,12 +226,15 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		Dictionary<string, RenderGroup> renderGroups = new Dictionary<string, RenderGroup>();
 
+		public int width, height;
+
 		/// <summary>
 		/// <c>GameManager</c> object used by this window.
 		/// </summary>
-		GameManager gameManager;
+		[Dependency]
+		GameManager gameManager = default!;
 
-		public Window(int width, int height, string title, GameManager _gameManager)
+		public Window(int _width, int _height, string title)
 			: base(
 				new GameWindowSettings()
 				{
@@ -239,12 +243,15 @@ namespace OnionEngine.Graphics
 				},
 				new NativeWindowSettings()
 				{
-					Size = new OpenTK.Mathematics.Vector2i(width, height),
+					Size = new OpenTK.Mathematics.Vector2i(_width, _height),
 					Title = title,
 					Vsync = VSyncMode.On
 				})
 		{
-			gameManager = _gameManager;
+			width = _width;
+			height = _height;
+
+			IoCManager.RegisterInstance(this);
 		}
 
 		protected override void Dispose(bool disposing)

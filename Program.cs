@@ -1,6 +1,7 @@
 using OnionEngine.Core;
 using OnionEngine.Graphics;
 using OnionEngine.Physics;
+using OnionEngine.IoC;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -56,25 +57,25 @@ namespace OnionEngine
 			Console.WriteLine();
 
 			// Load prototypes
-			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
-			Console.WriteLine();
+			// gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
+			// Console.WriteLine();
 
 			// Create and remove some entities and components
 			Int64 entity1 = gameManager.AddEntity("entity1");
-			Console.Write("New entity has id ");
-			Console.WriteLine(entity1);
+			// Console.Write("New entity has id ");
+			// Console.WriteLine(entity1);
 
 			Int64 renderComponent = gameManager.AddComponent(new RenderComponent());
-			Console.Write("New RenderComponent has id ");
-			Console.WriteLine(renderComponent);
+			// Console.Write("New RenderComponent has id ");
+			// Console.WriteLine(renderComponent);
 
 			Int64 rigidBodyComponent = gameManager.AddComponent(new RigidBodyComponent());
-			Console.Write("New RigidBodyComponent has id ");
-			Console.WriteLine(rigidBodyComponent);
+			// Console.Write("New RigidBodyComponent has id ");
+			// Console.WriteLine(rigidBodyComponent);
 
 			Int64 collidableComponent = gameManager.AddComponent(new CollidableComponent());
-			Console.Write("New CollidableComponent has id ");
-			Console.WriteLine(collidableComponent);
+			// Console.Write("New CollidableComponent has id ");
+			// Console.WriteLine(collidableComponent);
 
 			Console.WriteLine();
 			Console.WriteLine(gameManager.DumpEntitiesAndComponents());
@@ -83,14 +84,14 @@ namespace OnionEngine
 
 			Console.WriteLine();
 
-			foreach (Int64 entity in gameManager.QueryEntitiesOwningComponents(new HashSet<Type> { typeof(RenderComponent), typeof(CollidableComponent) }))
-			{
-				Console.Write("Entity ");
-				Console.Write(entity);
-				Console.WriteLine(" matches query");
-			}
+			// foreach (Int64 entity in gameManager.QueryEntitiesOwningComponents(new HashSet<Type> { typeof(RenderComponent), typeof(CollidableComponent) }))
+			// {
+			// 	Console.Write("Entity ");
+			// 	Console.Write(entity);
+			// 	Console.WriteLine(" matches query");
+			// }
 
-			using (Window win = new Window(800, 600, "Onion engine demo", gameManager))
+			using (Window win = IoCManager.CreateInstance<Window>(new object[] { 800, 600, "Onion engine demo" }))
 			{
 				win.Run();
 			}

@@ -156,13 +156,13 @@ namespace OnionEngine.Core
 
 			// List all components (by type) currently owned by this entity
 			Dictionary<Type, Int64> ownedComponents = new Dictionary<Type, Int64>();
-			if (debugMode)
-				Console.WriteLine("Components owned by entity " + component.entityId + ":");
+			// if (debugMode)
+			// 	Console.WriteLine("Components owned by entity " + component.entityId + ":");
 			foreach (Int64 componentId2 in componentsByEntity[component.entityId])
 			{
 				ownedComponents.Add(components[componentId2].GetType(), componentId2);
-				if (debugMode)
-					Console.WriteLine(componentId2 + " " + components[componentId2].GetType().Name);
+				// if (debugMode)
+				// 	Console.WriteLine(componentId2 + " " + components[componentId2].GetType().Name);
 			}
 
 			// Check if this entity should get new entity system
