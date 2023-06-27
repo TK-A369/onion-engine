@@ -58,8 +58,8 @@ namespace OnionEngine
 			Console.WriteLine();
 
 			// Load prototypes
-			// gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
-			// Console.WriteLine();
+			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
+			Console.WriteLine();
 			gameManager.prototypeManager.entityPrototypes.Add("physical-body", new EntityPrototype("entity1", new List<ComponentPrototype>() {
 				new ComponentPrototype("PositionComponent", new Dictionary<string, object> () {}),
 				new ComponentPrototype("PhysicalBodyComponent", new Dictionary<string, object> () {})
@@ -89,6 +89,7 @@ namespace OnionEngine
 			Int64 spawnedEntity = gameManager.prototypeManager.SpawnEntityPrototype("entity1");
 			Console.Write("Spawned entity has id ");
 			Console.WriteLine(spawnedEntity);
+			gameManager.prototypeManager.SpawnEntityPrototype("myent1");
 
 			Console.WriteLine();
 			Console.WriteLine(gameManager.DumpEntitiesAndComponents());

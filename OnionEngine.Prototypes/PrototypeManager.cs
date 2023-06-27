@@ -41,7 +41,28 @@ namespace OnionEngine.Prototypes
 			// Entity prototypes
 			foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entityproto") ?? throw new Exception("Prototype XML error"))
 			{
-				//TODO
+				// TODO: Params
+
+				List<string> inheritFrom = new List<string>();
+				foreach (XmlNode parentNode in prototypeNode.SelectNodes("./inherit") ?? throw new Exception("Prototype XML error"))
+				{
+					inheritFrom.Add(parentNode.InnerText);
+				}
+
+				List<ComponentPrototype> components = new List<ComponentPrototype>();
+				foreach (XmlNode componentNode in prototypeNode.SelectNodes("./entity/component") ?? throw new Exception("Prototype XML error"))
+				{
+					// TODO: Properties
+					Dictionary<string, object> properties = new Dictionary<string, object>();
+
+					components.Add(new ComponentPrototype(
+						((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).InnerText, properties));
+				}
+
+				EntityPrototype entityPrototype = new EntityPrototype(
+					((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).InnerText,
+					components, inheritFrom);
+				entityPrototypes.Add(entityPrototype.name, entityPrototype);
 			}
 
 			// Entity group prototypes
