@@ -242,6 +242,18 @@ namespace OnionEngine.Core
 			throw new Exception("Component not found");
 		}
 
+		public bool HasComponent(Int64 entityId, Type componentType)
+		{
+			foreach (Int64 componentId in componentsByEntity[entityId])
+			{
+				if (components[componentId].GetType().IsAssignableTo(componentType))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		/// <summary>
 		/// Get basic informations about currently existing entities and their components
 		/// </summary>

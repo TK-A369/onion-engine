@@ -2,6 +2,7 @@ using OnionEngine.Core;
 using OnionEngine.Graphics;
 using OnionEngine.Physics;
 using OnionEngine.IoC;
+using OnionEngine.Prototypes;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -19,7 +20,7 @@ namespace OnionEngine
 	class TestEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		RigidBodyComponent? rigidBodyComponent = default!;
+		RigidBodyComponent rigidBodyComponent = default!;
 
 		public override void OnCreate()
 		{
@@ -59,6 +60,14 @@ namespace OnionEngine
 			// Load prototypes
 			// gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
 			// Console.WriteLine();
+			gameManager.prototypeManager.entityPrototypes.Add("physical-body", new EntityPrototype("entity1", new List<ComponentPrototype>() {
+				new ComponentPrototype("PositionComponent", new Dictionary<string, object> () {}),
+				new ComponentPrototype("PhysicalBodyComponent", new Dictionary<string, object> () {})
+			}));
+			gameManager.prototypeManager.entityPrototypes.Add("entity1", new EntityPrototype("entity1", new List<ComponentPrototype>() {
+				new ComponentPrototype("CollidableComponent", new Dictionary<string, object> () {}),
+				new ComponentPrototype("RigidBodyComponent", new Dictionary<string, object> () {})
+			}, new List<string>() { "physical-body" }));
 
 			// Create and remove some entities and components
 			Int64 entity1 = gameManager.AddEntity("entity1");
@@ -76,6 +85,10 @@ namespace OnionEngine
 			Int64 collidableComponent = gameManager.AddComponent(new CollidableComponent());
 			// Console.Write("New CollidableComponent has id ");
 			// Console.WriteLine(collidableComponent);
+
+			Int64 spawnedEntity = gameManager.prototypeManager.SpawnEntityPrototype("entity1");
+			Console.Write("Spawned entity has id ");
+			Console.WriteLine(spawnedEntity);
 
 			Console.WriteLine();
 			Console.WriteLine(gameManager.DumpEntitiesAndComponents());

@@ -4,67 +4,86 @@
 	<xs:element name="protos">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="proto" maxOccurs="unbounded">
+				<xs:element ref="entitygroupproto" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="entityproto" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="params">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="paramdef"></xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="entitygroupproto">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="params" minOccurs="0" />
+				<xs:element name="entities">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="params" minOccurs="0">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="paramdef"></xs:element>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="import" minOccurs="0">
-							</xs:element>
-							<xs:element name="entities">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="entity">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="component"
-														maxOccurs="unbounded">
-														<xs:complexType>
-															<xs:sequence>
-																<xs:element name="prop"
-																	minOccurs="0"
-																	maxOccurs="unbounded">
-																	<xs:complexType>
-																		<xs:simpleContent>
-																			<xs:extension
-																				base="xs:string">
-																				<xs:attribute
-																					name="name"
-																					type="xs:string"
-																					use="required" />
-																				<xs:attribute
-																					name="type"
-																					type="xs:string"
-																					use="required" />
-																			</xs:extension>
-																		</xs:simpleContent>
-																	</xs:complexType>
-																</xs:element>
-															</xs:sequence>
-															<xs:attribute name="type"
-																type="xs:string"
-																use="required" />
-														</xs:complexType>
-													</xs:element>
-												</xs:sequence>
-												<xs:attribute name="name" type="xs:string"
-													use="required" />
-											</xs:complexType>
-										</xs:element>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
+							<xs:element ref="entityimport" minOccurs="0" maxOccurs="unbounded"></xs:element>
 						</xs:sequence>
-						<xs:attribute name="name" type="xs:string"
-							use="required" />
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
+			<xs:attribute name="name" type="xs:string"
+				use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="entityproto">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="params" minOccurs="0" />
+				<xs:element name="inherit" minOccurs="0">
+				</xs:element>
+				<xs:element ref="entity" />
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string"
+				use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="entity">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="component"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="entityimport">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="component">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="prop"
+					minOccurs="0"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="type"
+				type="xs:string"
+				use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="prop">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension
+					base="xs:string">
+					<xs:attribute
+						name="name"
+						type="xs:string"
+						use="required" />
+					<xs:attribute
+						name="type"
+						type="xs:string"
+						use="required" />
+				</xs:extension>
+			</xs:simpleContent>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

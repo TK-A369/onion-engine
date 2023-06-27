@@ -10,7 +10,7 @@ namespace OnionEngine.Prototypes
 	{
 		public string name = "";
 		public List<ComponentPrototype> components = new List<ComponentPrototype>();
-		public List<EntityPrototype> inheritFrom = new List<EntityPrototype>();
+		public List<string> inheritFrom = new List<string>();
 
 		public EntityPrototype(string _name)
 		{
@@ -21,7 +21,7 @@ namespace OnionEngine.Prototypes
 			name = _name;
 			components = _components;
 		}
-		public EntityPrototype(string _name, List<ComponentPrototype> _components, List<EntityPrototype> _inheritFrom)
+		public EntityPrototype(string _name, List<ComponentPrototype> _components, List<string> _inheritFrom)
 		{
 			name = _name;
 			components = _components;
@@ -76,7 +76,7 @@ namespace OnionEngine.Prototypes
 	/// <summary>
 	/// Prototype describing many entities.
 	/// </summary>
-	public class Prototype
+	public class EntityGroupPrototype
 	{
 		public List<EntityPrototype> entityList = new List<EntityPrototype>();
 	}

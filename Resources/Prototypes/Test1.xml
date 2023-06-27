@@ -4,32 +4,40 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://www.w3schools.com ./PrototypeSchema.xsd"
 	xsi:noNamespaceSchemaLocation="./PrototypeSchema.xsd">
-	<proto name="abc">
+	<entitygroupproto name="abc">
 		<params>
 			<paramdef />
 		</params>
-		<import name="someproto" />
 		<entities>
-			<entity name="myent1">
-				<component type="RenderComponent">
-					<prop name="param1" type="number">123</prop>
-				</component>
-			</entity>
+			<entityimport name="myent1" />
 		</entities>
-	</proto>
-	<proto name="123456">
+	</entitygroupproto>
+	<entitygroupproto name="123456">
 		<entities>
-			<entity name="someentity">
-				<component type="RigidBodyComponent"></component>
-			</entity>
+			<entityimport name="someentity" />
 		</entities>
-	</proto>
-	<proto name="someproto">
+	</entitygroupproto>
+	<entitygroupproto name="someproto">
 		<entities>
-			<entity name="myent2">
-				<component type="RigidBodyComponent"></component>
-				<component type="CollidableComponent"></component>
-			</entity>
+			<entityimport name="myent2" />
 		</entities>
-	</proto>
+	</entitygroupproto>
+	<entityproto name="myent1">
+		<entity>
+			<component type="RenderComponent">
+				<prop name="param1" type="number">123</prop>
+			</component>
+		</entity>
+	</entityproto>
+	<entityproto name="myent2">
+		<entity>
+			<component type="RigidBodyComponent"></component>
+			<component type="CollidableComponent"></component>
+		</entity>
+	</entityproto>
+	<entityproto name="someentity">
+		<entity>
+			<component type="RigidBodyComponent"></component>
+		</entity>
+	</entityproto>
 </protos>
