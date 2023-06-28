@@ -11,7 +11,7 @@
 	</entitygroupproto>
 	<entityproto name="myent1">
 		<entity name="myent1">
-			<component type="RenderComponent">
+			<component type="PhysicalBodyComponent">
 				<prop name="param1" type="number">123</prop>
 			</component>
 		</entity>

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace OnionEngine.Prototypes
 {
 	/// <summary>
@@ -38,13 +40,13 @@ namespace OnionEngine.Prototypes
 	public class ComponentPrototype
 	{
 		public string type = "";
-		public Dictionary<string, object> properties = new Dictionary<string, object>();
+		public Dictionary<string, PrototypeParameter> properties = new Dictionary<string, PrototypeParameter>();
 
 		public ComponentPrototype(string _type)
 		{
 			type = _type;
 		}
-		public ComponentPrototype(string _type, Dictionary<string, object> _properties)
+		public ComponentPrototype(string _type, Dictionary<string, PrototypeParameter> _properties)
 		{
 			type = _type;
 			properties = _properties;
@@ -65,6 +67,27 @@ namespace OnionEngine.Prototypes
 		{
 			type = _type;
 			value = _value;
+		}
+
+		public object GetValue()
+		{
+			switch (type)
+			{
+				case ParameterType.Number:
+					if (double.TryParse(value, CultureInfo.InvariantCulture, out double number))
+						return number;
+					else
+						return (double)0.0;
+				case ParameterType.Bool:
+					if (bool.TryParse(value, out bool boolValue))
+						return boolValue;
+					else
+						return false;
+				case ParameterType.String:
+					return value;
+				default:
+					throw new NotImplementedException();
+			}
 		}
 
 		public enum ParameterType

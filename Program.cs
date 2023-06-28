@@ -61,12 +61,14 @@ namespace OnionEngine
 			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
 			Console.WriteLine();
 			gameManager.prototypeManager.entityPrototypes.Add("physical-body", new EntityPrototype("entity1", new List<ComponentPrototype>() {
-				new ComponentPrototype("PositionComponent", new Dictionary<string, object> () {}),
-				new ComponentPrototype("PhysicalBodyComponent", new Dictionary<string, object> () {})
+				new ComponentPrototype("PositionComponent", new Dictionary<string, PrototypeParameter> () {}),
+				new ComponentPrototype("PhysicalBodyComponent", new Dictionary<string, PrototypeParameter> () {
+					{"mass", new PrototypeParameter(PrototypeParameter.ParameterType.Number, "3.2")}
+				})
 			}));
 			gameManager.prototypeManager.entityPrototypes.Add("entity1", new EntityPrototype("entity1", new List<ComponentPrototype>() {
-				new ComponentPrototype("CollidableComponent", new Dictionary<string, object> () {}),
-				new ComponentPrototype("RigidBodyComponent", new Dictionary<string, object> () {})
+				new ComponentPrototype("CollidableComponent", new Dictionary<string, PrototypeParameter> () {}),
+				new ComponentPrototype("RigidBodyComponent", new Dictionary<string, PrototypeParameter> () {})
 			}, new List<string>() { "physical-body" }));
 
 			// Create and remove some entities and components
@@ -97,6 +99,8 @@ namespace OnionEngine
 			gameManager.RemoveComponent(rigidBodyComponent);
 
 			Console.WriteLine();
+
+			// Console.WriteLine("Mass: " + ((PhysicalBodyComponent)gameManager.components[6]).mass);
 
 			// foreach (Int64 entity in gameManager.QueryEntitiesOwningComponents(new HashSet<Type> { typeof(RenderComponent), typeof(CollidableComponent) }))
 			// {

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Xml;
 
 using OnionEngine.Core;
@@ -53,7 +54,7 @@ namespace OnionEngine.Prototypes
 				foreach (XmlNode componentNode in prototypeNode.SelectNodes("./entity/component") ?? throw new Exception("Prototype XML error"))
 				{
 					// TODO: Properties
-					Dictionary<string, object> properties = new Dictionary<string, object>();
+					Dictionary<string, PrototypeParameter> properties = new Dictionary<string, PrototypeParameter>();
 
 					components.Add(new ComponentPrototype(
 						((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).InnerText, properties));
@@ -102,13 +103,19 @@ namespace OnionEngine.Prototypes
 				foreach (ComponentPrototype componentPrototype in entityPrototype.components)
 				{
 					Component component = gameManager.CreateComponentByTypeName(componentPrototype.type, new object[] { });
-					if (!gameManager.HasComponent(entityId, component.GetType()))
+					Type componentType = component.GetType();
+					if (!gameManager.HasComponent(entityId, componentType))
 					{
 						component.entityId = entityId;
 						gameManager.AddComponent(component);
 					}
 
-					// TODO: Assign values to component's fields
+					// Assign values to component's fields
+					foreach (KeyValuePair<string, PrototypeParameter> property in componentPrototype.properties)
+					{
+						FieldInfo fieldInfo = componentType.GetField(property.Key) ?? throw new Exception("Field " + property.Key + " not found in component type " + componentType.Name);
+						fieldInfo.SetValue(component, property.Value.GetValue());
+					}
 				}
 
 				// Recursively call for parent prototypes
@@ -133,6 +140,8 @@ namespace OnionEngine.Prototypes
 			EntityGroupPrototype prototype = entityGroupPrototypes[prototypeName];
 
 			List<Int64> entitiesIds = new List<Int64>();
+
+			// TODO: Remake, so it uses SpawnEntityPrototype
 
 			foreach (EntityPrototype entityPrototype in prototype.entityList)
 			{
