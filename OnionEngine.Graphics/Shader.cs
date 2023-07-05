@@ -94,5 +94,23 @@ namespace OnionEngine.Graphics
 		{
 			GL.UseProgram(handle);
 		}
+
+		public void SetUniform1i(string name, int value)
+		{
+			int uniformLocation = GL.GetUniformLocation(handle, name);
+			GL.Uniform1(uniformLocation, value);
+		}
+
+		public void SetUniform1f(string name, float value)
+		{
+			int uniformLocation = GL.GetUniformLocation(handle, name);
+			GL.Uniform1(uniformLocation, value);
+		}
+
+		public void SetUniform2f(string name, float valueX, float valueY)
+		{
+			int uniformLocation = GL.GetUniformLocation(handle, name);
+			GL.Uniform2(uniformLocation, valueX, valueY);
+		}
 	}
 }
