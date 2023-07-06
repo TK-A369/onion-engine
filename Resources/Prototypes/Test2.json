@@ -1,6 +1,6 @@
 [
 	{
-		"type": "TestPrototype",
+		"type": "Test",
 		"field1": 7,
 		"field2": 3.2,
 		"field3": "Hello World!",

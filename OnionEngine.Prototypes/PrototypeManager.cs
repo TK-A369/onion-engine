@@ -25,12 +25,66 @@ namespace OnionEngine.Prototypes
 
 		private Dictionary<string, Type> prototypeTypes = new Dictionary<string, Type>();
 
+		public List<Func<JsonElement, Type, object?>> jsonParsers;
+
 		[Dependency]
 		private GameManager gameManager = default!;
 
 		public PrototypeManager()
 		{
 			IoCManager.RegisterInstance(this);
+
+			jsonParsers = new List<Func<JsonElement, Type, object?>>()
+			{
+				(JsonElement e, Type t) => {
+					if(t == typeof(int))
+						return e.GetInt32();
+					return null;
+				},
+				(JsonElement e, Type t) => {
+					if(t == typeof(float))
+						return e.GetSingle();
+					return null;
+				},
+				(JsonElement e, Type t) => {
+					if(t == typeof(double))
+						return e.GetDouble();
+					return null;
+				},
+				(JsonElement e, Type t) => {
+					if(t == typeof(string))
+						return e.GetString();
+					return null;
+				},
+				(JsonElement e, Type t) => {
+					if(t == typeof(bool))
+						return e.GetBoolean();
+					return null;
+				},
+				(JsonElement e, Type t) => {
+					if (t.IsGenericType)
+					{
+						Type genericTypeDefinition = t.GetGenericTypeDefinition();
+						if (genericTypeDefinition == typeof(List<>))
+						{
+							if (e.ValueKind == JsonValueKind.Array)
+							{
+								object list = Activator.CreateInstance(t) ?? throw new Exception("Couldn't create instance of desired type");
+								foreach (JsonElement child in e.EnumerateArray())
+								{
+									object? childParsed = ParseJSONParam(child, t.GetGenericArguments()[0]);
+									if (childParsed != null)
+										(t.GetMethod("Add") ?? throw new Exception("Couldn't add element to list via reflection")).Invoke(list, new object[] { childParsed });
+									else
+										return null;
+								}
+								return list;
+							}
+						}
+					}
+					return null;
+				}
+			};
 		}
 
 		public void RegisterPrototypeType(Type prototypeType)
@@ -117,47 +171,13 @@ namespace OnionEngine.Prototypes
 		// 	}
 		// }
 
-		private object? ParseJSONParam(JsonElement json, Type desiredType)
+		public object? ParseJSONParam(JsonElement json, Type desiredType)
 		{
-			if (desiredType == typeof(int))
+			foreach (Func<JsonElement, Type, object?> parser in jsonParsers)
 			{
-				return json.GetInt32();
-			}
-			else if (desiredType == typeof(float))
-			{
-				return json.GetSingle();
-			}
-			else if (desiredType == typeof(double))
-			{
-				return json.GetDouble();
-			}
-			else if (desiredType == typeof(string))
-			{
-				return json.GetString();
-			}
-			else if (desiredType == typeof(bool))
-			{
-				return json.GetBoolean();
-			}
-			else if (desiredType.IsGenericType)
-			{
-				Type genericTypeDefinition = desiredType.GetGenericTypeDefinition();
-				if (genericTypeDefinition == typeof(List<>))
-				{
-					if (json.ValueKind == JsonValueKind.Array)
-					{
-						object list = Activator.CreateInstance(desiredType) ?? throw new Exception("Couldn't create instance of desired type");
-						foreach (JsonElement child in json.EnumerateArray())
-						{
-							object? childParsed = ParseJSONParam(child, desiredType.GetGenericArguments()[0]);
-							if (childParsed != null)
-								(desiredType.GetMethod("Add") ?? throw new Exception("Couldn't add element to list via reflection")).Invoke(list, new object[] { childParsed });
-							else
-								return null;
-						}
-						return list;
-					}
-				}
+				object? parsedValue = parser(json, desiredType);
+				if (parsedValue != null)
+					return parsedValue;
 			}
 			return null;
 		}
@@ -169,7 +189,7 @@ namespace OnionEngine.Prototypes
 			{
 				// Determine prototype type
 				string prototypeTypeName = prototypeDescriptor.GetProperty("type").GetString() ?? throw new Exception("Prototype JSON error");
-				Type prototypeType = prototypeTypes[prototypeTypeName] ?? throw new Exception("Prototype type not found");
+				Type prototypeType = (prototypeTypes.ContainsKey(prototypeTypeName) ? prototypeTypes[prototypeTypeName] : prototypeTypes[prototypeTypeName + "Prototype"]) ?? throw new Exception("Prototype type not found");
 
 				// Create instance
 				Prototype prototypeInstance = (Prototype)(Activator.CreateInstance(prototypeType) ?? throw new Exception("Error ocurred when creating prototype instance"));
