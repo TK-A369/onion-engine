@@ -2,6 +2,43 @@ using System.Globalization;
 
 namespace OnionEngine.Prototypes
 {
+	public abstract class Prototype
+	{
+
+	}
+
+	public class PrototypeAttribute : Attribute { }
+
+	public class PrototypeParameterAttribute : Attribute
+	{
+		public bool required;
+		public string? nameOverride;
+
+		public PrototypeParameterAttribute(bool _required = false, string? _nameOverride = null)
+		{
+			required = _required;
+			nameOverride = _nameOverride;
+		}
+	}
+
+	[Prototype]
+	public class TestPrototype : Prototype
+	{
+		[PrototypeParameter(true)]
+		public int field1 = 0;
+		[PrototypeParameter(true)]
+		public double field2 = 0.0;
+		[PrototypeParameter(true)]
+		public string field3 = "";
+		[PrototypeParameter(true)]
+		public List<int> field4 = new List<int>();
+
+		public override string ToString()
+		{
+			return "TestPrototype {" + field1 + ", " + field2 + ", \"" + field3 + "\", {" + String.Join(", ", field4) + "}}";
+		}
+	}
+
 	/// <summary>
 	/// Prototype describing one entity and its components.
 	/// It does not describe entity systems. They are created automatically if all dependencies are satisfied.

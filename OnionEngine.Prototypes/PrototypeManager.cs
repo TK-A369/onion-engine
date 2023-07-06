@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Xml;
+using System.Text.Json;
+using System.Globalization;
 
 using OnionEngine.Core;
 using OnionEngine.IoC;
@@ -11,14 +13,6 @@ namespace OnionEngine.Prototypes
 	/// </summary>
 	public class PrototypeManager
 	{
-		public PrototypeManager()
-		{
-			IoCManager.RegisterInstance(this);
-		}
-
-		[Dependency]
-		private GameManager gameManager = default!;
-
 		/// <summary>
 		/// Dictionary of entity group prototypes by their names.
 		/// </summary>
@@ -29,64 +23,177 @@ namespace OnionEngine.Prototypes
 		/// </summary>
 		public Dictionary<string, EntityPrototype> entityPrototypes = new Dictionary<string, EntityPrototype>();
 
+		private Dictionary<string, Type> prototypeTypes = new Dictionary<string, Type>();
+
+		[Dependency]
+		private GameManager gameManager = default!;
+
+		public PrototypeManager()
+		{
+			IoCManager.RegisterInstance(this);
+		}
+
+		public void RegisterPrototypeType(Type prototypeType)
+		{
+			if (prototypeType.IsAssignableTo(typeof(Prototype)))
+			{
+				prototypeTypes.Add(prototypeType.Name, prototypeType);
+			}
+			else
+			{
+				throw new Exception("Type " + prototypeType.FullName + " is not a prototype type.");
+			}
+		}
+
+		public void AutoregisterPrototypeTypes()
+		{
+			IEnumerable<Type> prototypeTypes = from assembly in AppDomain.CurrentDomain.GetAssemblies()
+											   from type in assembly.GetTypes()
+											   where type.IsDefined(typeof(PrototypeAttribute))
+											   select type;
+
+			foreach (Type prototypeType in prototypeTypes)
+				RegisterPrototypeType(prototypeType);
+		}
+
 		/// <summary>
 		/// Load prototype from XML.
 		/// </summary>
 		/// <param name="xmlPrototype"><c>string</c> containing XML describing the prototype.</param>
 		/// <exception cref="Exception"></exception>
-		public void LoadPrototypes(string xmlPrototype)
+		// public void LoadPrototypes(string xmlPrototype)
+		// {
+		// 	XmlDocument doc = new XmlDocument();
+		// 	doc.LoadXml(xmlPrototype);
+
+		// 	// Entity prototypes
+		// 	foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entityproto") ?? throw new Exception("Prototype XML error"))
+		// 	{
+		// 		// TODO: Params
+
+		// 		List<string> inheritFrom = new List<string>();
+		// 		foreach (XmlNode parentNode in prototypeNode.SelectNodes("./inherit") ?? throw new Exception("Prototype XML error"))
+		// 		{
+		// 			inheritFrom.Add(parentNode.InnerText);
+		// 		}
+
+		// 		List<ComponentPrototype> components = new List<ComponentPrototype>();
+		// 		foreach (XmlNode componentNode in prototypeNode.SelectNodes("./entity/component") ?? throw new Exception("Prototype XML error"))
+		// 		{
+		// 			// TODO: Properties
+		// 			Dictionary<string, PrototypeParameter> properties = new Dictionary<string, PrototypeParameter>();
+
+		// 			components.Add(new ComponentPrototype(
+		// 				((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).InnerText, properties));
+		// 		}
+
+		// 		EntityPrototype entityPrototype = new EntityPrototype(
+		// 			((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).InnerText,
+		// 			components, inheritFrom);
+		// 		entityPrototypes.Add(entityPrototype.name, entityPrototype);
+		// 	}
+
+		// 	// Entity group prototypes
+		// 	foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entitygroupproto") ?? throw new Exception("Prototype XML error"))
+		// 	{
+		// 		EntityGroupPrototype prototype = new EntityGroupPrototype();
+		// 		string prototypeName = ((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
+		// 		Console.WriteLine("Registering prototype: " + prototypeName);
+		// 		foreach (XmlNode entityNode in prototypeNode.SelectNodes("./entities/entity") ?? throw new Exception("Prototype XML error"))
+		// 		{
+		// 			List<ComponentPrototype> componentPrototypes = new List<ComponentPrototype>();
+		// 			string entityName = ((entityNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
+		// 			Console.WriteLine("  Entity with components:");
+		// 			foreach (XmlNode componentNode in entityNode.SelectNodes("./component") ?? throw new Exception("Prototype XML error"))
+		// 			{
+		// 				string prototypeType = ((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).Value;
+		// 				Console.WriteLine("    " + prototypeType);
+		// 				ComponentPrototype componentPrototype = new ComponentPrototype(prototypeType);
+		// 				componentPrototypes.Add(componentPrototype);
+		// 			}
+		// 			prototype.entityList.Add(new EntityPrototype(entityName, componentPrototypes));
+		// 		}
+		// 		entityGroupPrototypes.Add(prototypeName, prototype);
+		// 	}
+		// }
+
+		private object? ParseJSONParam(JsonElement json, Type desiredType)
 		{
-			XmlDocument doc = new XmlDocument();
-			doc.LoadXml(xmlPrototype);
-
-			// Entity prototypes
-			foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entityproto") ?? throw new Exception("Prototype XML error"))
+			if (desiredType == typeof(int))
 			{
-				// TODO: Params
-
-				List<string> inheritFrom = new List<string>();
-				foreach (XmlNode parentNode in prototypeNode.SelectNodes("./inherit") ?? throw new Exception("Prototype XML error"))
-				{
-					inheritFrom.Add(parentNode.InnerText);
-				}
-
-				List<ComponentPrototype> components = new List<ComponentPrototype>();
-				foreach (XmlNode componentNode in prototypeNode.SelectNodes("./entity/component") ?? throw new Exception("Prototype XML error"))
-				{
-					// TODO: Properties
-					Dictionary<string, PrototypeParameter> properties = new Dictionary<string, PrototypeParameter>();
-
-					components.Add(new ComponentPrototype(
-						((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).InnerText, properties));
-				}
-
-				EntityPrototype entityPrototype = new EntityPrototype(
-					((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).InnerText,
-					components, inheritFrom);
-				entityPrototypes.Add(entityPrototype.name, entityPrototype);
+				return json.GetInt32();
 			}
-
-			// Entity group prototypes
-			foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entitygroupproto") ?? throw new Exception("Prototype XML error"))
+			else if (desiredType == typeof(float))
 			{
-				EntityGroupPrototype prototype = new EntityGroupPrototype();
-				string prototypeName = ((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
-				Console.WriteLine("Registering prototype: " + prototypeName);
-				foreach (XmlNode entityNode in prototypeNode.SelectNodes("./entities/entity") ?? throw new Exception("Prototype XML error"))
+				return json.GetSingle();
+			}
+			else if (desiredType == typeof(double))
+			{
+				return json.GetDouble();
+			}
+			else if (desiredType == typeof(string))
+			{
+				return json.GetString();
+			}
+			else if (desiredType == typeof(bool))
+			{
+				return json.GetBoolean();
+			}
+			else if (desiredType.IsGenericType)
+			{
+				Type genericTypeDefinition = desiredType.GetGenericTypeDefinition();
+				if (genericTypeDefinition == typeof(List<>))
 				{
-					List<ComponentPrototype> componentPrototypes = new List<ComponentPrototype>();
-					string entityName = ((entityNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
-					Console.WriteLine("  Entity with components:");
-					foreach (XmlNode componentNode in entityNode.SelectNodes("./component") ?? throw new Exception("Prototype XML error"))
+					if (json.ValueKind == JsonValueKind.Array)
 					{
-						string prototypeType = ((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).Value;
-						Console.WriteLine("    " + prototypeType);
-						ComponentPrototype componentPrototype = new ComponentPrototype(prototypeType);
-						componentPrototypes.Add(componentPrototype);
+						object list = Activator.CreateInstance(desiredType) ?? throw new Exception("Couldn't create instance of desired type");
+						foreach (JsonElement child in json.EnumerateArray())
+						{
+							object? childParsed = ParseJSONParam(child, desiredType.GetGenericArguments()[0]);
+							if (childParsed != null)
+								(desiredType.GetMethod("Add") ?? throw new Exception("Couldn't add element to list via reflection")).Invoke(list, new object[] { childParsed });
+							else
+								return null;
+						}
+						return list;
 					}
-					prototype.entityList.Add(new EntityPrototype(entityName, componentPrototypes));
 				}
-				entityGroupPrototypes.Add(prototypeName, prototype);
+			}
+			return null;
+		}
+
+		public void LoadPrototypes(string jsonPrototypes)
+		{
+			JsonDocument document = JsonDocument.Parse(jsonPrototypes);
+			foreach (JsonElement prototypeDescriptor in document.RootElement.EnumerateArray())
+			{
+				// Determine prototype type
+				string prototypeTypeName = prototypeDescriptor.GetProperty("type").GetString() ?? throw new Exception("Prototype JSON error");
+				Type prototypeType = prototypeTypes[prototypeTypeName] ?? throw new Exception("Prototype type not found");
+
+				// Create instance
+				Prototype prototypeInstance = (Prototype)(Activator.CreateInstance(prototypeType) ?? throw new Exception("Error ocurred when creating prototype instance"));
+
+				// Set fields
+				foreach (FieldInfo fieldInfo in prototypeType.GetFields())
+				{
+					PrototypeParameterAttribute? paramAttribute = fieldInfo.GetCustomAttribute<PrototypeParameterAttribute>(true);
+					if (paramAttribute != null)
+					{
+						string propertyName = paramAttribute.nameOverride ?? fieldInfo.Name;
+						if (prototypeDescriptor.TryGetProperty(propertyName, out JsonElement propertyValue))
+						{
+							fieldInfo.SetValue(prototypeInstance, ParseJSONParam(propertyValue, fieldInfo.FieldType) ?? throw new Exception("Couldn't parse property value"));
+						}
+						else
+						{
+							if (paramAttribute.required)
+								throw new Exception("Required property " + propertyName + " not found in prototype of type " + prototypeTypeName);
+						}
+					}
+				}
+
+				Console.Write("Loaded prototype:\n" + prototypeInstance.ToString() + "\n");
 			}
 		}
 

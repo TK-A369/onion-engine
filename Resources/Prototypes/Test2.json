@@ -1,0 +1,14 @@
+[
+	{
+		"type": "TestPrototype",
+		"field1": 7,
+		"field2": 3.2,
+		"field3": "Hello World!",
+		"field4": [
+			1,
+			3,
+			7,
+			2
+		]
+	}
+]
