@@ -62,16 +62,16 @@ namespace OnionEngine
 			// gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
 			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test2.json"));
 			Console.WriteLine();
-			gameManager.prototypeManager.entityPrototypes.Add("physical-body", new EntityPrototype("entity1", new List<ComponentPrototype>() {
-				new ComponentPrototype("PositionComponent", new Dictionary<string, PrototypeParameter> () {}),
-				new ComponentPrototype("PhysicalBodyComponent", new Dictionary<string, PrototypeParameter> () {
-					{"mass", new PrototypeParameter(PrototypeParameter.ParameterType.Number, "3.2")}
-				})
-			}));
-			gameManager.prototypeManager.entityPrototypes.Add("entity1", new EntityPrototype("entity1", new List<ComponentPrototype>() {
-				new ComponentPrototype("CollidableComponent", new Dictionary<string, PrototypeParameter> () {}),
-				new ComponentPrototype("RigidBodyComponent", new Dictionary<string, PrototypeParameter> () {})
-			}, new List<string>() { "physical-body" }));
+			// gameManager.prototypeManager.entityPrototypes.Add("physical-body", new EntityPrototype("entity1", new List<ComponentDescriptor>() {
+			// 	new ComponentDescriptor("PositionComponent", new Dictionary<string, ComponentProperty> () {}),
+			// 	new ComponentDescriptor("PhysicalBodyComponent", new Dictionary<string, ComponentProperty> () {
+			// 		{"mass", new ComponentParameter(ComponentProperty.ParameterType.Number, "3.2")}
+			// 	})
+			// }));
+			// gameManager.prototypeManager.entityPrototypes.Add("entity1", new EntityPrototype("entity1", new List<ComponentDescriptor>() {
+			// 	new ComponentDescriptor("CollidableComponent", new Dictionary<string, ComponentProperty> () {}),
+			// 	new ComponentDescriptor("RigidBodyComponent", new Dictionary<string, ComponentProperty> () {})
+			// }, new List<string>() { "physical-body" }));
 
 			// Create and remove some entities and components
 			Int64 entity1 = gameManager.AddEntity("entity1");
@@ -90,9 +90,9 @@ namespace OnionEngine
 			// Console.Write("New CollidableComponent has id ");
 			// Console.WriteLine(collidableComponent);
 
-			Int64 spawnedEntity = gameManager.prototypeManager.SpawnEntityPrototype("entity1");
-			Console.Write("Spawned entity has id ");
-			Console.WriteLine(spawnedEntity);
+			// Int64 spawnedEntity = gameManager.prototypeManager.SpawnEntityPrototype("entity1");
+			// Console.Write("Spawned entity has id ");
+			// Console.WriteLine(spawnedEntity);
 			// gameManager.prototypeManager.SpawnEntityPrototype("myent1");
 
 			Console.WriteLine();

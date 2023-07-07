@@ -1,5 +1,5 @@
-[
-	{
+{
+	"test1": {
 		"type": "Test",
 		"field1": 7,
 		"field2": 3.2,
@@ -10,5 +10,15 @@
 			7,
 			2
 		]
+	},
+	"myent1": {
+		"type": "Entity",
+		"name": "myent1",
+		"components": [
+			{
+				"type": "PhysicalBodyComponent",
+				"mass": 7.3
+			}
+		]
 	}
-]
+}

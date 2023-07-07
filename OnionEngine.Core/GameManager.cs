@@ -120,6 +120,11 @@ namespace OnionEngine.Core
 				RegisterComponentType(componentType);
 		}
 
+		public Type GetComponentTypeByName(string name)
+		{
+			return componentTypesByName[name];
+		}
+
 		/// <summary>
 		/// Create new <c>Component</c> object.
 		/// </summary>
@@ -129,7 +134,7 @@ namespace OnionEngine.Core
 		/// <exception cref="Exception"></exception>
 		public Component CreateComponentByTypeName(string typeName, object[] args)
 		{
-			Type componentType = componentTypesByName[typeName];
+			Type componentType = GetComponentTypeByName(typeName);
 			Component component = Activator.CreateInstance(componentType, args) as Component ?? throw new Exception("Provided type name must inherit from Component");
 
 			return component;

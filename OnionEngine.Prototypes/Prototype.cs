@@ -45,22 +45,27 @@ namespace OnionEngine.Prototypes
 	/// Such prototype can also inherit from other entity prototypes.
 	/// The name will be overriden. Components from both parent and child prototype will be added to entity.
 	/// </summary>
-	public class EntityPrototype
+	[Prototype]
+	public class EntityPrototype : Prototype
 	{
+		[PrototypeParameter(true)]
 		public string name = "";
-		public List<ComponentPrototype> components = new List<ComponentPrototype>();
+		[PrototypeParameter(true)]
+		public List<ComponentDescriptor> components = new List<ComponentDescriptor>();
+		[PrototypeParameter(false)]
 		public List<string> inheritFrom = new List<string>();
 
+		public EntityPrototype() { }
 		public EntityPrototype(string _name)
 		{
 			name = _name;
 		}
-		public EntityPrototype(string _name, List<ComponentPrototype> _components)
+		public EntityPrototype(string _name, List<ComponentDescriptor> _components)
 		{
 			name = _name;
 			components = _components;
 		}
-		public EntityPrototype(string _name, List<ComponentPrototype> _components, List<string> _inheritFrom)
+		public EntityPrototype(string _name, List<ComponentDescriptor> _components, List<string> _inheritFrom)
 		{
 			name = _name;
 			components = _components;
@@ -74,16 +79,16 @@ namespace OnionEngine.Prototypes
 	/// It has its type and properties.
 	/// As for now, component prototypes don't support inheritance.
 	/// </summary>
-	public class ComponentPrototype
+	public class ComponentDescriptor
 	{
 		public string type = "";
-		public Dictionary<string, PrototypeParameter> properties = new Dictionary<string, PrototypeParameter>();
+		public Dictionary<string, ComponentProperty> properties = new Dictionary<string, ComponentProperty>();
 
-		public ComponentPrototype(string _type)
+		public ComponentDescriptor(string _type)
 		{
 			type = _type;
 		}
-		public ComponentPrototype(string _type, Dictionary<string, PrototypeParameter> _properties)
+		public ComponentDescriptor(string _type, Dictionary<string, ComponentProperty> _properties)
 		{
 			type = _type;
 			properties = _properties;
@@ -95,49 +100,25 @@ namespace OnionEngine.Prototypes
 	/// It can have following types: number, bool, string or internal reference.
 	/// Internal reference means reference to entity or component inside this prototype. Currently WIP.
 	/// </summary>
-	public class PrototypeParameter
+	public class ComponentProperty
 	{
-		ParameterType type;
-		string value;
+		public Type type;
+		public object value;
 
-		public PrototypeParameter(ParameterType _type, string _value)
+		public ComponentProperty(Type _type, object _value)
 		{
 			type = _type;
 			value = _value;
-		}
-
-		public object GetValue()
-		{
-			switch (type)
-			{
-				case ParameterType.Number:
-					if (double.TryParse(value, CultureInfo.InvariantCulture, out double number))
-						return number;
-					else
-						return (double)0.0;
-				case ParameterType.Bool:
-					if (bool.TryParse(value, out bool boolValue))
-						return boolValue;
-					else
-						return false;
-				case ParameterType.String:
-					return value;
-				default:
-					throw new NotImplementedException();
-			}
-		}
-
-		public enum ParameterType
-		{
-			Number, Bool, String, InternalReference
 		}
 	}
 
 	/// <summary>
 	/// Prototype describing many entities.
 	/// </summary>
-	public class EntityGroupPrototype
+	[Prototype]
+	public class EntityGroupPrototype : Prototype
 	{
+		[PrototypeParameter(true)]
 		public List<EntityPrototype> entityList = new List<EntityPrototype>();
 	}
 }
