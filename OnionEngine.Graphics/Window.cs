@@ -51,6 +51,8 @@ namespace OnionEngine.Graphics
 
 		public Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
 
+		TextureAtlas? textureAtlas;
+
 		/// <summary>
 		/// <c>GameManager</c> object used by this window.
 		/// </summary>
@@ -97,13 +99,22 @@ namespace OnionEngine.Graphics
 
 		protected override void OnLoad()
 		{
-			// Equilateral triangle https://en.wikipedia.org/wiki/Equilateral_triangle
+			textureAtlas = new TextureAtlas(128, new List<string>() {
+				"Resources/Textures/human-1.png",
+				"Resources/Textures/floor-tile-1.png",
+				"Resources/Textures/smiling-ball-1.png"
+			});
+			textures["floor-tile-1"] = new Texture("Resources/Textures/floor-tile-1.png");
+
 			float[] triangle =
 			{
-            // x        y      z      r     g     b    
-              -0.866f, -0.75f, 0.0f,  1.0f, 0.0f, 0.0f,
-			   0.866f, -0.75f, 0.0f,  1.0f, 1.0f, 0.0f,
-			   0.0f,    0.75f, 0.0f,  0.0f, 0.0f, 1.0f,
+            // x        y      z      r     g     b      texX,  texY
+              -0.75f,  -0.75f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f,  0.0f,
+			   0.75f,  -0.75f, 0.0f,  1.0f, 1.0f, 0.0f,  1.0f,  0.0f,
+			   0.75f,   0.75f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
+			  -0.75f,  -0.75f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f,  0.0f,
+			  -0.75f,   0.75f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f,
+			   0.75f,   0.75f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
 			};
 
 			vertexArrayObject = GL.GenVertexArray();
@@ -112,12 +123,15 @@ namespace OnionEngine.Graphics
 			GL.BindVertexArray(vertexArrayObject);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
 			GL.BufferData(BufferTarget.ArrayBuffer, triangle.Length * sizeof(float), triangle, BufferUsageHint.DynamicDraw);
-			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-			GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
+			GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
+			GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
 			GL.EnableVertexAttribArray(0);
 			GL.EnableVertexAttribArray(1);
+			GL.EnableVertexAttribArray(2);
 
 			shaders["basic-shader"] = new Shader("Resources/Shaders/basic_shader.vert", "Resources/Shaders/basic_shader.frag");
+			shaders["textured-shader"] = new Shader("Resources/Shaders/textured_shader.vert", "Resources/Shaders/textured_shader.frag");
 
 			renderGroups = new Dictionary<string, RenderGroup>()
 			{
@@ -181,10 +195,13 @@ namespace OnionEngine.Graphics
 			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
-			shaders["basic-shader"].Use();
 			GL.BindVertexArray(vertexArrayObject);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
-			GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+			shaders["textured-shader"].Use();
+			textureAtlas!.Use();
+			// textures["floor-tile-1"].Use(TextureUnit.Texture0);
+			shaders["textured-shader"].SetUniform1i("texture0", 0);
+			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
 			foreach (RenderGroup renderGroup in renderGroups.Values)
 			{

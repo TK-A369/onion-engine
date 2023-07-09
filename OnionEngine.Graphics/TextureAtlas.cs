@@ -62,11 +62,14 @@ namespace OnionEngine.Graphics
 						{
 							freeRectangles.Add(new Rectangle() { startX = rectangle.startX, startY = rectangle.startY + image.Height, width = rectangle.width, height = residueY });
 						}
+
+						break;
 					}
 				}
 			}
 
 			textureHandle = GL.GenTexture();
+			Use();
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, size, size, 0, PixelFormat.Rgba, PixelType.UnsignedByte, textureAtlasData);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
