@@ -102,7 +102,9 @@ namespace OnionEngine.Graphics
 			textureAtlas = new TextureAtlas(128, new List<string>() {
 				"Resources/Textures/human-1.png",
 				"Resources/Textures/floor-tile-1.png",
-				"Resources/Textures/smiling-ball-1.png"
+				"Resources/Textures/smiling-ball-1.png",
+				"Resources/Textures/smiling-ball-1.png",
+				"Resources/Textures/floor-tile-1.png"
 			});
 			textures["floor-tile-1"] = new Texture("Resources/Textures/floor-tile-1.png");
 

@@ -33,6 +33,7 @@ namespace OnionEngine.Graphics
 				StbImage.stbi_set_flip_vertically_on_load(1);
 				ImageResult image = ImageResult.FromStream(File.OpenRead(texturePath), ColorComponents.RedGreenBlueAlpha);
 
+				bool foundFreeRectangle = false;
 				foreach (Rectangle rectangle in freeRectangles)
 				{
 					if (image.Width <= rectangle.width && image.Height <= rectangle.height)
@@ -56,15 +57,20 @@ namespace OnionEngine.Graphics
 
 						if (residueX > 0)
 						{
-							freeRectangles.Add(new Rectangle() { startX = rectangle.startX + image.Width, startY = rectangle.startY, width = residueX, height = rectangle.height });
+							freeRectangles.Add(new Rectangle() { startX = rectangle.startX + image.Width, startY = rectangle.startY, width = residueX, height = image.Height });
 						}
 						if (residueY > 0)
 						{
 							freeRectangles.Add(new Rectangle() { startX = rectangle.startX, startY = rectangle.startY + image.Height, width = rectangle.width, height = residueY });
 						}
 
+						foundFreeRectangle = true;
 						break;
 					}
+				}
+				if (!foundFreeRectangle)
+				{
+					throw new Exception("Could not find a free rectangle in the texture atlas - consider enlarging it or creating a new one");
 				}
 			}
 
