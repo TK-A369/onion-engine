@@ -21,7 +21,15 @@ namespace OnionEngine.Graphics
 			size = _size;
 
 			SortedSet<Rectangle> freeRectangles = new SortedSet<Rectangle>(
-				Comparer<Rectangle>.Create((a, b) => Math.Min(a.width, a.height).CompareTo(Math.Min(b.width, b.height))))
+				Comparer<Rectangle>.Create((a, b) =>
+				{
+					int comp = Math.Min(a.width, a.height).CompareTo(Math.Min(b.width, b.height));
+					if (comp == 0)
+					{
+						return a.GetHashCode().CompareTo(b.GetHashCode());
+					}
+					return comp;
+				}))
 				{
 					new Rectangle() { startX = 0, startY = 0, width = size, height = size }
 				};
@@ -54,6 +62,7 @@ namespace OnionEngine.Graphics
 
 						Int64 residueX = rectangle.width - image.Width;
 						Int64 residueY = rectangle.height - image.Height;
+						Console.WriteLine("Residue: " + residueX + ", " + residueY);
 
 						if (residueX > 0)
 						{
@@ -68,6 +77,12 @@ namespace OnionEngine.Graphics
 						break;
 					}
 				}
+
+				Console.WriteLine("Free rectangles:");
+				foreach (Rectangle r in freeRectangles)
+					Console.WriteLine(r.startX + ", " + r.startY + ", " + r.width + ", " + r.height);
+				Console.WriteLine();
+
 				if (!foundFreeRectangle)
 				{
 					throw new Exception("Could not find a free rectangle in the texture atlas - consider enlarging it or creating a new one");
