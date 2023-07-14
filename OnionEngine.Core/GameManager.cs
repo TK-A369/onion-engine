@@ -135,7 +135,7 @@ namespace OnionEngine.Core
 		public Component CreateComponentByTypeName(string typeName, object[] args)
 		{
 			Type componentType = GetComponentTypeByName(typeName);
-			Component component = Activator.CreateInstance(componentType, args) as Component ?? throw new Exception("Provided type name must inherit from Component");
+			Component component = IoCManager.CreateInstance(componentType, args) as Component ?? throw new Exception("Provided type name must inherit from Component");
 
 			return component;
 		}
@@ -181,7 +181,7 @@ namespace OnionEngine.Core
 						if (debugMode)
 							Console.WriteLine("Creating new instance of entity system " + entitySystemPair.Key.Name);
 						// Create instance of entity system
-						EntitySystem entitySystem = Activator.CreateInstance(entitySystemPair.Key) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
+						EntitySystem entitySystem = IoCManager.CreateInstance(entitySystemPair.Key, new object[] { }) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
 						foreach (KeyValuePair<Type, string> dependencyPair in entitySystemPair.Value)
 						{
 							(entitySystemPair.Key.GetField(dependencyPair.Value, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new NullReferenceException()).SetValue(entitySystem, components[ownedComponents[dependencyPair.Key]]);

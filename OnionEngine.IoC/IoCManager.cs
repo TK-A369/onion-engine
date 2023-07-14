@@ -106,8 +106,13 @@ namespace OnionEngine.IoC
 		/// <exception cref="Exception">When couldn't create instance, or dependency hasn't been found</exception>
 		public static T CreateInstance<T>(object[] args, bool injectDependencies = true) where T : class
 		{
+			return (T)CreateInstance(typeof(T), args, injectDependencies);
+		}
+
+		public static object CreateInstance(Type type, object[] args, bool injectDependencies = true)
+		{
 			// Create instance
-			T instance = (T)(Activator.CreateInstance(typeof(T), args) ?? throw new Exception("Error occurred when creating instance of type " + typeof(T).FullName));
+			object instance = Activator.CreateInstance(type, args) ?? throw new Exception("Error occurred when creating instance of type " + typeof(T).FullName)
 
 			InjectDependencies(instance);
 
