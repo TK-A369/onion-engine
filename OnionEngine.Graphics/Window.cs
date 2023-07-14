@@ -99,17 +99,17 @@ namespace OnionEngine.Graphics
 
 		protected override void OnLoad()
 		{
-			textureAtlas = new TextureAtlas(128, new List<string>() {
-				"Resources/Textures/human-1.png",
-				"Resources/Textures/floor-tile-1.png",
-				"Resources/Textures/smiling-ball-1.png",
-				"Resources/Textures/smiling-ball-1.png",
-				"Resources/Textures/floor-tile-1.png",
-				"Resources/Textures/human-1.png",
-				"Resources/Textures/human-1.png",
-				"Resources/Textures/human-1.png",
-				"Resources/Textures/floor-tile-1.png",
-				"Resources/Textures/floor-tile-1.png"
+			textureAtlas = new TextureAtlas(128, new Dictionary<string, string>() {
+				{"human-1","Resources/Textures/human-1.png"},
+				{"floor-tile-1","Resources/Textures/floor-tile-1.png"},
+				{"smiling-ball-1","Resources/Textures/smiling-ball-1.png"},
+				{"smiling-ball-2","Resources/Textures/smiling-ball-1.png"},
+				{"floor-tile-2","Resources/Textures/floor-tile-1.png"},
+				{"human-2","Resources/Textures/human-1.png"},
+				{"human-3","Resources/Textures/human-1.png"},
+				{"human-4","Resources/Textures/human-1.png"},
+				{"floor-tile-3","Resources/Textures/floor-tile-1.png"},
+				{"floor-tile-4","Resources/Textures/floor-tile-1.png"}
 			});
 			textures["floor-tile-1"] = new Texture("Resources/Textures/floor-tile-1.png");
 

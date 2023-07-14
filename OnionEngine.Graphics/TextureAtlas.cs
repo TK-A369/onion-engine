@@ -1,3 +1,5 @@
+using OnionEngine.DataTypes;
+
 using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
 
@@ -9,6 +11,8 @@ namespace OnionEngine.Graphics
 
 		public byte[] textureAtlasData;
 
+		public Dictionary<string, Mat<float>> texturesTransformations = new Dictionary<string, Mat<float>>();
+
 		int textureHandle;
 
 		private struct Rectangle
@@ -16,7 +20,7 @@ namespace OnionEngine.Graphics
 			public Int64 startX, startY, width, height;
 		}
 
-		public TextureAtlas(int _size, List<string> _texturesPaths)
+		public TextureAtlas(int _size, Dictionary<string, string> _textures)
 		{
 			size = _size;
 
@@ -36,10 +40,10 @@ namespace OnionEngine.Graphics
 
 			textureAtlasData = new byte[size * size * 4];
 
-			foreach (string texturePath in _texturesPaths)
+			foreach (KeyValuePair<string, string> texture in _textures)
 			{
 				StbImage.stbi_set_flip_vertically_on_load(1);
-				ImageResult image = ImageResult.FromStream(File.OpenRead(texturePath), ColorComponents.RedGreenBlueAlpha);
+				ImageResult image = ImageResult.FromStream(File.OpenRead(texture.Value), ColorComponents.RedGreenBlueAlpha);
 
 				bool foundFreeRectangle = false;
 				foreach (Rectangle rectangle in freeRectangles)
@@ -57,6 +61,19 @@ namespace OnionEngine.Graphics
 								}
 							}
 						}
+
+						Mat<float> transformationMatrix = new Mat<float>(3, 3);
+						transformationMatrix.Element(0, 0) = ((float)image.Width) / ((float)size);
+						transformationMatrix.Element(0, 1) = 0.0f;
+						transformationMatrix.Element(0, 2) = ((float)rectangle.startX) / ((float)size);
+						transformationMatrix.Element(1, 0) = 0.0f;
+						transformationMatrix.Element(1, 1) = ((float)image.Height) / ((float)size);
+						transformationMatrix.Element(1, 2) = ((float)rectangle.startY) / ((float)size);
+						transformationMatrix.Element(2, 0) = 0.0f;
+						transformationMatrix.Element(2, 1) = 0.0f;
+						transformationMatrix.Element(2, 2) = 1.0f;
+						texturesTransformations[texture.Key] = transformationMatrix;
+						Console.WriteLine("Texture transformation matrix:\n" + transformationMatrix.ToString());
 
 						freeRectangles.Remove(rectangle);
 
