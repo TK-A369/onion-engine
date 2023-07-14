@@ -111,6 +111,16 @@ namespace OnionEngine
 			// 	Console.WriteLine(" matches query");
 			// }
 
+			// Events demo
+			Event<string> event1 = new Event<string>();
+			event1.RegisterSubscriber((string s) =>
+			{
+				Console.WriteLine("Subscriber received \"" + s + "\"");
+			});
+			Console.WriteLine("Firing event...");
+			event1.Fire("Hello world!");
+			Console.WriteLine("Event fired!");
+
 			using (Window win = IoCManager.CreateInstance<Window>(new object[] { 800, 600, "Onion engine demo" }))
 			{
 				win.Run();
