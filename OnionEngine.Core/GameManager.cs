@@ -51,9 +51,14 @@ namespace OnionEngine.Core
 		Dictionary<HashSet<Type>, HashSet<Int64>> entitiesByOwnedComponentsCache = new Dictionary<HashSet<Type>, HashSet<Int64>>();
 
 		/// <summary>
-		/// Dictionary of registered entity systems and their dependencies set
+		/// Dictionary of registered entity systems and their required dependencies
 		/// </summary>
-		Dictionary<Type, Dictionary<Type, string>> registeredEntitySystems = new Dictionary<Type, Dictionary<Type, string>>();
+		Dictionary<Type, Dictionary<Type, string>> registeredEntitySystemsDependeciesRequired = new Dictionary<Type, Dictionary<Type, string>>();
+
+		/// <summary>
+		/// Dictionary of registered entity systems and their all dependencies
+		/// </summary>
+		Dictionary<Type, Dictionary<Type, string>> registeredEntitySystemsDependeciesAll = new Dictionary<Type, Dictionary<Type, string>>();
 
 		/// <summary>
 		/// Dictionary of entity systems by their type and parent entity
@@ -171,7 +176,7 @@ namespace OnionEngine.Core
 			}
 
 			// Check if this entity should get new entity system
-			foreach (KeyValuePair<Type, Dictionary<Type, string>> entitySystemPair in registeredEntitySystems)
+			foreach (KeyValuePair<Type, Dictionary<Type, string>> entitySystemPair in registeredEntitySystemsDependeciesRequired)
 			{
 				// If all components needed by system are owned by this entity, and such system hasn't been created yet
 				if (!entitySystemsByParent[component.entityId].ContainsKey(entitySystemPair.Key))
@@ -182,7 +187,8 @@ namespace OnionEngine.Core
 							Console.WriteLine("Creating new instance of entity system " + entitySystemPair.Key.Name);
 						// Create instance of entity system
 						EntitySystem entitySystem = Activator.CreateInstance(entitySystemPair.Key) as EntitySystem ?? throw new Exception("Bad EntitySystem registered: " + entitySystemPair.Key);
-						foreach (KeyValuePair<Type, string> dependencyPair in entitySystemPair.Value)
+						// Inject component dependencies
+						foreach (KeyValuePair<Type, string> dependencyPair in registeredEntitySystemsDependeciesAll[entitySystemPair.Key])
 						{
 							(entitySystemPair.Key.GetField(dependencyPair.Value, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new NullReferenceException()).SetValue(entitySystem, components[ownedComponents[dependencyPair.Key]]);
 						}
@@ -210,7 +216,7 @@ namespace OnionEngine.Core
 			{
 				Type entitySystemType = entitySystemPair.Key;
 				// If this entity system depends on this component
-				if (registeredEntitySystems[entitySystemType].Keys.Contains(components[componentId].GetType()))
+				if (registeredEntitySystemsDependeciesRequired[entitySystemType].Keys.Contains(components[componentId].GetType()))
 				{
 					if (debugMode)
 						Console.WriteLine("Destroying entity system of type " + entitySystemType.Name + " on entity " + components[componentId].entityId);
@@ -345,16 +351,22 @@ namespace OnionEngine.Core
 			if (!entitySystemType.IsAssignableTo(typeof(EntitySystem)))
 				throw new ArgumentException("You must provide Type object representing subclass of EntitySystem");
 
-			Dictionary<Type, string> dependencies = new Dictionary<Type, string>();
+			Dictionary<Type, string> dependenciesRequired = new Dictionary<Type, string>();
+			Dictionary<Type, string> dependenciesAll = new Dictionary<Type, string>();
 			foreach (FieldInfo fieldInfo in entitySystemType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
 			{
 				if (fieldInfo.IsDefined(typeof(EntitySystemDependencyAttribute)))
 				{
-					dependencies.Add(fieldInfo.FieldType, fieldInfo.Name);
+					dependenciesAll.Add(fieldInfo.FieldType, fieldInfo.Name);
+					if (((EntitySystemDependencyAttribute)fieldInfo.GetCustomAttribute(typeof(EntitySystemDependencyAttribute))!).required)
+					{
+						dependenciesRequired.Add(fieldInfo.FieldType, fieldInfo.Name);
+					}
 				}
 			}
 
-			registeredEntitySystems.Add(entitySystemType, dependencies);
+			registeredEntitySystemsDependeciesRequired.Add(entitySystemType, dependenciesRequired);
+			registeredEntitySystemsDependeciesAll.Add(entitySystemType, dependenciesAll);
 
 			if (debugMode)
 				Console.WriteLine("Registered entity system type " + entitySystemType.Name);

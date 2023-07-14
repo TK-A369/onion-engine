@@ -26,8 +26,19 @@ namespace OnionEngine.Core
 
 	/// <summary>
 	/// Attribute used to mark fields in entity systems that are their dependencies. It means that this entity system requires the component of the type of that field.
-	/// Entity system must have at least one dependency field.
+	/// It might be required or optional.
+	/// Entity system must have at least one required dependency field.
 	/// When some entity has all components this entity system depends on, the instance of this entity system will be created.
 	/// </summary>
-	public class EntitySystemDependencyAttribute : Attribute { }
+	public class EntitySystemDependencyAttribute : Attribute
+	{
+		public bool required = true;
+
+		public EntitySystemDependencyAttribute() { }
+
+		public EntitySystemDependencyAttribute(bool _required)
+		{
+			required = _required;
+		}
+	}
 }
