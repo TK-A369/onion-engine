@@ -6,7 +6,7 @@ namespace OnionEngine.Graphics
 	[Component]
 	public class SpriteComponent : Component
 	{
-		public string? spriteName = null;
+		public string? textureName = null;
 
 		public Vec2<double> size = new Vec2<double>(1, 1);
 

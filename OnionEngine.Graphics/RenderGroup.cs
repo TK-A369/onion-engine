@@ -16,7 +16,6 @@ namespace OnionEngine.Graphics
 	{
 		public List<float> vertices;
 		public List<int> indices;
-		public List<string> textures;
 		public string renderGroup;
 	}
 

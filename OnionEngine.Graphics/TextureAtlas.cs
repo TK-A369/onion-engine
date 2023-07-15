@@ -5,21 +5,50 @@ using StbImageSharp;
 
 namespace OnionEngine.Graphics
 {
+	/// <summary>
+	/// This is one big texture holding other textures.
+	/// Currently texture atlas is always square. Internal textures are never rotated - this might change in the future.
+	/// It provides transformation martices for each texture, which can be used to transfor from coordinates in internal texture to global coordinates.
+	/// </summary>
 	public class TextureAtlas
 	{
+		/// <summary>
+		/// Size of the texture atlas.
+		/// </summary>
 		public int size;
 
+		/// <summary>
+		/// Array containing one big texture made by joining other smaller textures.
+		/// </summary>
 		public byte[] textureAtlasData;
 
+		/// <summary>
+		/// Dictionary containing transformation martices for each texture.
+		/// Multiply this matrix by local (internal texture) coordinates to get global coordinates.
+		/// </summary>
 		public Dictionary<string, Mat<float>> texturesTransformations = new Dictionary<string, Mat<float>>();
 
-		int textureHandle;
+		/// <summary>
+		/// Handle to OpenGL texture.
+		/// </summary>
+		private int textureHandle;
 
+		/// <summary>
+		/// Struct describing rectangle. It cannot be rotated.
+		/// </summary>
 		private struct Rectangle
 		{
 			public Int64 startX, startY, width, height;
 		}
 
+		/// <summary>
+		/// Create new texture atlas and fill it with textures from given files.
+		/// Currently algorithm of filling texture atlas isn't best - it might leave more free space that necessary.
+		/// Also it never rotates textures. But as of now, it seems to be good enough.
+		/// </summary>
+		/// <param name="_size">Size of texture atlas</param>
+		/// <param name="_textures">Dictionary, where key is texture name, and value is path to file</param>
+		/// <exception cref="Exception">When those textures cannot be fit into texture atlas</exception>
 		public TextureAtlas(int _size, Dictionary<string, string> _textures)
 		{
 			size = _size;
@@ -113,6 +142,10 @@ namespace OnionEngine.Graphics
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
 		}
 
+		/// <summary>
+		/// Activate texture unit and bind texture atlas.
+		/// </summary>
+		/// <param name="unit">Texture unit to activate - defaults to 0</param>
 		public void Use(TextureUnit unit = TextureUnit.Texture0)
 		{
 			GL.ActiveTexture(unit);

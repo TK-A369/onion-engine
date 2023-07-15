@@ -12,6 +12,19 @@ namespace OnionEngine.Graphics
 	/// </summary>
 	public class Window : GameWindow
 	{
+		/// <summary>
+		/// Dimensions of the window.
+		/// </summary>
+		public int width, height;
+
+		/// <summary>
+		/// List of texture atlases.
+		/// WIP.
+		/// </summary>
+		public List<TextureAtlas> textureAtlases = new List<TextureAtlas>();
+
+		public Event<object?> drawSprites = new Event<object?>();
+
 		// OpenGL stuff
 
 		/// <summary>
@@ -46,12 +59,6 @@ namespace OnionEngine.Graphics
 		/// Dictionary of render groups by their names.
 		/// </summary>
 		Dictionary<string, RenderGroup> renderGroups = new Dictionary<string, RenderGroup>();
-
-		public int width, height;
-
-		public Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
-
-		TextureAtlas? textureAtlas;
 
 		/// <summary>
 		/// <c>GameManager</c> object used by this window.
@@ -99,7 +106,7 @@ namespace OnionEngine.Graphics
 
 		protected override void OnLoad()
 		{
-			textureAtlas = new TextureAtlas(128, new Dictionary<string, string>() {
+			textureAtlases.Add(new TextureAtlas(128, new Dictionary<string, string>() {
 				{"human-1","Resources/Textures/human-1.png"},
 				{"floor-tile-1","Resources/Textures/floor-tile-1.png"},
 				{"smiling-ball-1","Resources/Textures/smiling-ball-1.png"},
@@ -110,8 +117,7 @@ namespace OnionEngine.Graphics
 				{"human-4","Resources/Textures/human-1.png"},
 				{"floor-tile-3","Resources/Textures/floor-tile-1.png"},
 				{"floor-tile-4","Resources/Textures/floor-tile-1.png"}
-			});
-			textures["floor-tile-1"] = new Texture("Resources/Textures/floor-tile-1.png");
+			}));
 
 			float[] triangle =
 			{
@@ -148,6 +154,14 @@ namespace OnionEngine.Graphics
 					{
 						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false },
 						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false }
+					}),
+				["textured-group"] = new RenderGroup(
+					shaders["textured-shader"],
+					new List<VertexAttributeDescriptor>()
+					{
+						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false },
+						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 4, normalized = false },
+						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 2, normalized = false }
 					})
 			};
 		}
@@ -169,6 +183,8 @@ namespace OnionEngine.Graphics
 
 		protected override void OnRenderFrame(FrameEventArgs args)
 		{
+			drawSprites.Fire(null);
+
 			// Clear render groups' vertices data
 			foreach (RenderGroup renderGroup in renderGroups.Values)
 			{
@@ -205,7 +221,7 @@ namespace OnionEngine.Graphics
 			GL.BindVertexArray(vertexArrayObject);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
 			shaders["textured-shader"].Use();
-			textureAtlas!.Use();
+			textureAtlases[0].Use();
 			// textures["floor-tile-1"].Use(TextureUnit.Texture0);
 			shaders["textured-shader"].SetUniform1i("texture0", 0);
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
