@@ -24,7 +24,7 @@ namespace OnionEngine.DataTypes
 		{
 			if (a.n != b.m)
 				throw new Exception("Those matrices (" + a.m + "x" + a.n + ") and (" + b.m + "x" + b.n + ") cannot be multiplied");
-			Console.WriteLine("(" + a.m + "x" + a.n + ") and (" + b.m + "x" + b.n + ")");
+
 			Mat<T> result = new Mat<T>(a.m, b.n);
 			for (int i = 0; i < a.m; i++)
 			{

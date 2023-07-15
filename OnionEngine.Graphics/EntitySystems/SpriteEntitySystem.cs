@@ -73,9 +73,7 @@ namespace OnionEngine.Graphics
 					indices = new List<int>() { 0, 1, 2, 0, 2, 3 },
 					renderGroup = "textured-group"
 				};
-				foreach (float element in renderData.vertices)
-					Console.Write(element + " ");
-				Console.WriteLine();
+
 				renderComponent.renderData.Add(renderData);
 
 				positionComponent.position.x += 0.001;
