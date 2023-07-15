@@ -2,11 +2,7 @@ using OnionEngine.Core;
 using OnionEngine.Graphics;
 using OnionEngine.Physics;
 using OnionEngine.IoC;
-using OnionEngine.Prototypes;
-
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
+using OnionEngine.DataTypes;
 
 namespace OnionEngine
 {
@@ -62,54 +58,10 @@ namespace OnionEngine
 			// gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test1.xml"));
 			gameManager.prototypeManager.LoadPrototypes(File.ReadAllText("Resources/Prototypes/Test2.json"));
 			Console.WriteLine();
-			// gameManager.prototypeManager.entityPrototypes.Add("physical-body", new EntityPrototype("entity1", new List<ComponentDescriptor>() {
-			// 	new ComponentDescriptor("PositionComponent", new Dictionary<string, ComponentProperty> () {}),
-			// 	new ComponentDescriptor("PhysicalBodyComponent", new Dictionary<string, ComponentProperty> () {
-			// 		{"mass", new ComponentParameter(ComponentProperty.ParameterType.Number, "3.2")}
-			// 	})
-			// }));
-			// gameManager.prototypeManager.entityPrototypes.Add("entity1", new EntityPrototype("entity1", new List<ComponentDescriptor>() {
-			// 	new ComponentDescriptor("CollidableComponent", new Dictionary<string, ComponentProperty> () {}),
-			// 	new ComponentDescriptor("RigidBodyComponent", new Dictionary<string, ComponentProperty> () {})
-			// }, new List<string>() { "physical-body" }));
 
-			// Create and remove some entities and components
-			Int64 entity1 = gameManager.AddEntity("entity1");
-			// Console.Write("New entity has id ");
-			// Console.WriteLine(entity1);
-
-			Int64 renderComponent = gameManager.AddComponent(new RenderComponent());
-			// Console.Write("New RenderComponent has id ");
-			// Console.WriteLine(renderComponent);
-
-			Int64 rigidBodyComponent = gameManager.AddComponent(new RigidBodyComponent());
-			// Console.Write("New RigidBodyComponent has id ");
-			// Console.WriteLine(rigidBodyComponent);
-
-			Int64 collidableComponent = gameManager.AddComponent(new CollidableComponent());
-			// Console.Write("New CollidableComponent has id ");
-			// Console.WriteLine(collidableComponent);
-
-			// Int64 spawnedEntity = gameManager.prototypeManager.SpawnEntityPrototype("entity1");
-			// Console.Write("Spawned entity has id ");
-			// Console.WriteLine(spawnedEntity);
-			// gameManager.prototypeManager.SpawnEntityPrototype("myent1");
-
-			Console.WriteLine();
 			Console.WriteLine(gameManager.DumpEntitiesAndComponents());
 
-			gameManager.RemoveComponent(rigidBodyComponent);
-
 			Console.WriteLine();
-
-			// Console.WriteLine("Mass: " + ((PhysicalBodyComponent)gameManager.components[6]).mass);
-
-			// foreach (Int64 entity in gameManager.QueryEntitiesOwningComponents(new HashSet<Type> { typeof(RenderComponent), typeof(CollidableComponent) }))
-			// {
-			// 	Console.Write("Entity ");
-			// 	Console.Write(entity);
-			// 	Console.WriteLine(" matches query");
-			// }
 
 			// Events demo
 			Event<string> event1 = new Event<string>();
@@ -123,6 +75,33 @@ namespace OnionEngine
 
 			using (Window win = IoCManager.CreateInstance<Window>(new object[] { 800, 600, "Onion engine demo" }))
 			{
+				win.afterLoadEvent.RegisterSubscriber((_) =>
+				{
+					// Create and remove some entities and components
+					Int64 entity1 = gameManager.AddEntity("entity1");
+
+					RenderComponent renderComponent = new RenderComponent();
+					renderComponent.entityId = entity1;
+					gameManager.AddComponent(renderComponent);
+
+					PositionComponent positionComponent = new PositionComponent();
+					positionComponent.entityId = entity1;
+					positionComponent.position = new Vec2<double>(0, 0);
+					gameManager.AddComponent(positionComponent);
+
+					RotationComponent rotationComponent = new RotationComponent();
+					rotationComponent.entityId = entity1;
+					rotationComponent.rotation = 0;
+					gameManager.AddComponent(rotationComponent);
+
+					SpriteComponent spriteComponent = new SpriteComponent();
+					spriteComponent.entityId = entity1;
+					spriteComponent.textureName = "human-1";
+					spriteComponent.size = new Vec2<double>(1, 1);
+					spriteComponent.rotation = 0;
+					gameManager.AddComponent(spriteComponent);
+				});
+
 				win.Run();
 			}
 		}

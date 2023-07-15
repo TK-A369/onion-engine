@@ -22,6 +22,7 @@ namespace OnionEngine.Core
 			}
 			foreach (WeakReference toBeDeletedWeakRef in toBeDeleted)
 			{
+				Console.WriteLine("Removing event subscriber");
 				subscribers.Remove(toBeDeletedWeakRef);
 			}
 		}

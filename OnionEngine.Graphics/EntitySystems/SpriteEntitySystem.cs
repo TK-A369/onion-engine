@@ -20,26 +20,67 @@ namespace OnionEngine.Graphics
 		[Dependency]
 		Window window = default!;
 
+		[Dependency]
+		GameManager gameManager = default!;
+
 		Mat<float> textureTransform = new Mat<float>(3, 3);
 
 		int textureAtlasId = 0;
+
+		Action<object?>? drawSpriteSubscriber;
 
 		public override void OnCreate()
 		{
 			textureTransform = window.textureAtlases[0].texturesTransformations[spriteComponent.textureName ?? throw new Exception("Texture name is null")];
 
-			window.drawSprites.RegisterSubscriber((_) =>
+			drawSpriteSubscriber = (_) =>
 			{
-				renderComponent.renderData.Add(new RenderData()
+				double rotation = 0.0;
+				if (gameManager.HasComponent(spriteComponent.entityId, typeof(RotationComponent)))
+				{
+					Int64 rotationComponentId = gameManager.GetComponent(spriteComponent.entityId, typeof(RotationComponent));
+					RotationComponent rotationComponent = (RotationComponent)gameManager.components[rotationComponentId];
+					rotation = rotationComponent.rotation;
+					rotationComponent.rotation += 0.005;
+				}
+
+				Mat<float> positionGlobalMat = positionComponent.position.ToMatTransform().Cast<float>();
+				Mat<float> positionRotatedGlobalMat = positionGlobalMat * Mat<float>.RotationMatrix(rotation);
+				Mat<float> positionSWGlobalMat = positionRotatedGlobalMat *
+					new Vec2<float>((float)(-spriteComponent.size.x / 2), (float)(-spriteComponent.size.y / 2)).ToMatVertical();
+				Mat<float> positionNWGlobalMat = positionRotatedGlobalMat *
+					new Vec2<float>((float)(-spriteComponent.size.x / 2), (float)(spriteComponent.size.y / 2)).ToMatVertical();
+				Mat<float> positionNEGlobalMat = positionRotatedGlobalMat *
+					new Vec2<float>((float)(spriteComponent.size.x / 2), (float)(spriteComponent.size.y / 2)).ToMatVertical();
+				Mat<float> positionSEGlobalMat = positionRotatedGlobalMat *
+					new Vec2<float>((float)(spriteComponent.size.x / 2), (float)(-spriteComponent.size.y / 2)).ToMatVertical();
+
+				Mat<float> texCoordsSWMat = textureTransform * new Vec2<float>(0, 0).ToMatVertical();
+				Mat<float> texCoordsNWMat = textureTransform * new Vec2<float>(0, 1).ToMatVertical();
+				Mat<float> texCoordsNEMat = textureTransform * new Vec2<float>(1, 1).ToMatVertical();
+				Mat<float> texCoordsSEMat = textureTransform * new Vec2<float>(1, 0).ToMatVertical();
+
+				RenderData renderData = new RenderData()
 				{
 					vertices = new List<float>()
 					{
-
+						// X                               Y                                  Z  Color_____  Texture coordinates
+						positionSWGlobalMat.Element(0, 0), positionSWGlobalMat.Element(1, 0), 0, 1, 0, 0, 1, texCoordsSWMat.Element(0, 0), texCoordsSWMat.Element(0, 1),
+						positionNWGlobalMat.Element(0, 0), positionNWGlobalMat.Element(1, 0), 0, 0, 1, 0, 1, texCoordsNWMat.Element(0, 0), texCoordsNWMat.Element(0, 1),
+						positionNEGlobalMat.Element(0, 0), positionNEGlobalMat.Element(1, 0), 0, 0, 0, 1, 1, texCoordsNEMat.Element(0, 0), texCoordsNEMat.Element(0, 1),
+						positionSEGlobalMat.Element(0, 0), positionSEGlobalMat.Element(1, 0), 0, 1, 1, 0, 1, texCoordsSEMat.Element(0, 0), texCoordsSEMat.Element(0, 1),
 					},
-					indices = new List<int>() { 0, 1, 2, 1, 2, 3 },
+					indices = new List<int>() { 0, 1, 2, 0, 2, 3 },
 					renderGroup = "textured-group"
-				});
-			});
+				};
+				foreach (float element in renderData.vertices)
+					Console.Write(element + " ");
+				Console.WriteLine();
+				renderComponent.renderData.Add(renderData);
+
+				positionComponent.position.x += 0.001;
+			};
+			window.drawSpritesEvent.RegisterSubscriber(new EventSubscriber<object?>(drawSpriteSubscriber));
 
 			base.OnCreate();
 		}

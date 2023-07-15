@@ -23,8 +23,8 @@ namespace OnionEngine.DataTypes
 		public static Mat<T> operator *(Mat<T> a, Mat<T> b)
 		{
 			if (a.n != b.m)
-				throw new Exception("Those matrices cannot be multiplied");
-
+				throw new Exception("Those matrices (" + a.m + "x" + a.n + ") and (" + b.m + "x" + b.n + ") cannot be multiplied");
+			Console.WriteLine("(" + a.m + "x" + a.n + ") and (" + b.m + "x" + b.n + ")");
 			Mat<T> result = new Mat<T>(a.m, b.n);
 			for (int i = 0; i < a.m; i++)
 			{
@@ -53,6 +53,35 @@ namespace OnionEngine.DataTypes
 				result += "|\n";
 			}
 
+			return result;
+		}
+
+		public Mat<T2> Cast<T2>() where T2 : INumber<T2>
+		{
+			Mat<T2> result = new Mat<T2>(m, n);
+			for (int i = 0; i < m; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					result.Element(i, j) = (T2)(dynamic)Element(i, j);
+				}
+			}
+
+			return result;
+		}
+
+		public static Mat<T> RotationMatrix(double angle)
+		{
+			Mat<T> result = new Mat<T>(3, 3);
+			result.Element(0, 0) = (T)(dynamic)Math.Cos(angle);
+			result.Element(0, 1) = (T)(dynamic)Math.Sin(angle);
+			result.Element(0, 2) = (T)(dynamic)0.0;
+			result.Element(1, 0) = (T)(dynamic)(-Math.Sin(angle));
+			result.Element(1, 1) = (T)(dynamic)Math.Cos(angle);
+			result.Element(1, 2) = (T)(dynamic)0.0;
+			result.Element(2, 0) = (T)(dynamic)0.0;
+			result.Element(2, 1) = (T)(dynamic)0.0;
+			result.Element(2, 2) = (T)(dynamic)1.0;
 			return result;
 		}
 	}

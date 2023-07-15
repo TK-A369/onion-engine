@@ -5,7 +5,7 @@ namespace OnionEngine.Physics
 {
 	/// <summary>
 	/// Component representing rigid body, which has angular velocity and moment of intertia.
-	/// Entities having this should also have <c>PhysicalBodyComponent</c> and <c>PositionComponent</c>.
+	/// Entities having this should also have <c>PhysicalBodyComponent</c>, <c>PositionComponent</c> and <c>RotationComponent</c>.
 	/// </summary>
 	[Component]
 	public sealed class RigidBodyComponent : Component

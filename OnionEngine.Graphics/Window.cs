@@ -23,7 +23,9 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public List<TextureAtlas> textureAtlases = new List<TextureAtlas>();
 
-		public Event<object?> drawSprites = new Event<object?>();
+		public Event<object?> afterLoadEvent = new Event<object?>();
+
+		public Event<object?> drawSpritesEvent = new Event<object?>();
 
 		// OpenGL stuff
 
@@ -164,6 +166,8 @@ namespace OnionEngine.Graphics
 						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 2, normalized = false }
 					})
 			};
+
+			afterLoadEvent.Fire(null);
 		}
 
 
@@ -183,7 +187,15 @@ namespace OnionEngine.Graphics
 
 		protected override void OnRenderFrame(FrameEventArgs args)
 		{
-			drawSprites.Fire(null);
+			HashSet<Int64> entitiesToRender = gameManager.QueryEntitiesOwningComponents(new HashSet<Type>() { typeof(RenderComponent) });
+			foreach (Int64 entity in entitiesToRender)
+			{
+				Int64 renderComponentId = gameManager.GetComponent(entity, typeof(RenderComponent));
+				RenderComponent renderComponent = (gameManager.components[renderComponentId] as RenderComponent) ?? throw new NullReferenceException();
+				renderComponent.renderData.Clear();
+			}
+
+			drawSpritesEvent.Fire(null);
 
 			// Clear render groups' vertices data
 			foreach (RenderGroup renderGroup in renderGroups.Values)
@@ -193,7 +205,6 @@ namespace OnionEngine.Graphics
 			}
 
 			// Add vertices to appropriate render groups
-			HashSet<Int64> entitiesToRender = gameManager.QueryEntitiesOwningComponents(new HashSet<Type>() { typeof(RenderComponent) });
 			foreach (Int64 entity in entitiesToRender)
 			{
 				Int64 renderComponentId = gameManager.GetComponent(entity, typeof(RenderComponent));
