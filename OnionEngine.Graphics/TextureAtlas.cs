@@ -72,7 +72,7 @@ namespace OnionEngine.Graphics
 			foreach (KeyValuePair<string, string> texture in _textures)
 			{
 				StbImage.stbi_set_flip_vertically_on_load(1);
-				ImageResult image = ImageResult.FromStream(File.OpenRead(texture.Value), ColorComponents.RedGreenBlueAlpha);
+				ImageResult image = ImageResult.FromStream(File.OpenRead(System.IO.Path.Join(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), texture.Value)), ColorComponents.RedGreenBlueAlpha);
 
 				bool foundFreeRectangle = false;
 				foreach (Rectangle rectangle in freeRectangles)
