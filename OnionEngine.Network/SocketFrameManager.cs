@@ -1,9 +1,12 @@
+using System.Text;
 using System.Net.Sockets;
 
 namespace OnionEngine.Network
 {
 	public class SocketFrameManager
 	{
+		public NetworkMessagesSerializer networkMessagesSerializer;
+
 		Socket socket;
 
 		Queue<byte> rxFifo = new Queue<byte>();
@@ -11,6 +14,7 @@ namespace OnionEngine.Network
 		public SocketFrameManager(Socket _socket)
 		{
 			socket = _socket;
+			networkMessagesSerializer = new NetworkMessagesSerializer();
 		}
 
 		public async void Tick()
@@ -37,10 +41,20 @@ namespace OnionEngine.Network
 					for (int i = 0; i < dataSize; i++)
 					{
 						dataBytes[i] = rxFifo.Dequeue();
-						//WIP
 					}
+					string dataStr = Encoding.ASCII.GetString(dataBytes);
+
+					var (msgType, msg) = networkMessagesSerializer.Deserialize(dataStr);
+					Console.WriteLine("Received message of type " + msgType + ": " + msg);
 				}
 			}
+		}
+
+		public async void SendMessage(NetMessage message)
+		{
+			string messageSerialized = networkMessagesSerializer.Serialize(message);
+
+			await socket.SendAsync(Encoding.ASCII.GetBytes(messageSerialized));
 		}
 	}
 }

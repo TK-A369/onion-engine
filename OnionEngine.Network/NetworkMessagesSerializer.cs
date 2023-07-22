@@ -1,9 +1,10 @@
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace OnionEngine.Network
 {
-	struct NetMessageWrapper
+	public struct NetMessageWrapper
 	{
 		public string type;
 		public XmlNode messageSerialized;
@@ -40,7 +41,11 @@ namespace OnionEngine.Network
 
 			NetMessageWrapper wrappedMsg = new NetMessageWrapper() { messageSerialized = doc, type = msg.GetType().Name };
 			StringWriter stringWriter = new StringWriter();
-			netMessageWrapperSerializer.Serialize(stringWriter, wrappedMsg);
+			using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter,
+				new XmlWriterSettings() { Encoding = Encoding.UTF8, Indent = false, OmitXmlDeclaration = true }))
+			{
+				netMessageWrapperSerializer.Serialize(xmlWriter, wrappedMsg);
+			}
 
 			return stringWriter.ToString();
 		}
