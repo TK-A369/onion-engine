@@ -50,7 +50,7 @@ namespace OnionEngine.Network
 			}
 		}
 
-		public async void SendMessage(NetMessage message)
+		public async Task SendMessage(NetMessage message)
 		{
 			string messageSerialized = networkMessagesSerializer.Serialize(message);
 

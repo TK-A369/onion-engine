@@ -10,11 +10,6 @@ namespace OnionEngine.Network
 		public XmlNode messageSerialized;
 	}
 
-	public abstract class NetMessage
-	{
-
-	}
-
 	public class NetworkMessagesSerializer
 	{
 		Dictionary<string, Type> messageTypes = new Dictionary<string, Type>();
