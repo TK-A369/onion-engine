@@ -30,6 +30,10 @@ namespace OnionEngine.Core
 		{
 			subscribers.Add(new WeakReference(subscriber));
 		}
+		public void UnregisterSubscriber(EventSubscriber<TArg> subscriber)
+		{
+			subscribers.RemoveWhere((WeakReference wr) => ((EventSubscriber<TArg>)wr.Target!) == subscriber);
+		}
 	}
 
 	public delegate void EventSubscriber<TArg>(TArg arg);

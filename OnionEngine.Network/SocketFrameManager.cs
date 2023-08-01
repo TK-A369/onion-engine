@@ -1,3 +1,5 @@
+using OnionEngine.Core;
+
 using System.Text;
 using System.Net.Sockets;
 
@@ -7,6 +9,8 @@ namespace OnionEngine.Network
 	{
 		public NetworkMessagesSerializer networkMessagesSerializer;
 
+		public Event<NetMessage> onMessageReceived;
+
 		Socket socket;
 
 		Queue<byte> rxFifo = new Queue<byte>();
@@ -15,6 +19,7 @@ namespace OnionEngine.Network
 		{
 			socket = _socket;
 			networkMessagesSerializer = new NetworkMessagesSerializer();
+			onMessageReceived = new Event<NetMessage>();
 		}
 
 		public async void Tick()
@@ -45,6 +50,7 @@ namespace OnionEngine.Network
 					string dataStr = Encoding.ASCII.GetString(dataBytes);
 
 					var (msgType, msg) = networkMessagesSerializer.Deserialize(dataStr);
+					onMessageReceived.Fire(msg);
 					Console.WriteLine("Received message of type " + msgType + ": " + msg);
 				}
 			}
