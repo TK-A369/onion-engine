@@ -2,8 +2,6 @@ using OnionEngine.Core;
 using OnionEngine.IoC;
 
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
@@ -179,9 +177,20 @@ namespace OnionEngine.Graphics
 		/// <summary>
 		/// Render image, based on <c>vertives</c>, <c>indices</c> and <c>shader</c>.
 		/// </summary>
-		public void Render()
+		public void Render(OffscreenRenderTarget? offscreenRenderTarget = null)
 		{
 			Bind();
+
+			if (offscreenRenderTarget != null)
+			{
+				offscreenRenderTarget.Bind();
+			}
+			else
+			{
+				// Render to default framebuffer - onscreen
+				GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+				GL.Viewport(0, 0, window.width, window.height);
+			}
 
 			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), BufferUsageHint.StreamDraw);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.StreamDraw);
