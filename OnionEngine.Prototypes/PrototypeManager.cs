@@ -159,67 +159,6 @@ namespace OnionEngine.Prototypes
 				RegisterPrototypeType(prototypeType);
 		}
 
-		/// <summary>
-		/// Load prototype from XML.
-		/// </summary>
-		/// <param name="xmlPrototype"><c>string</c> containing XML describing the prototype.</param>
-		/// <exception cref="Exception"></exception>
-		// public void LoadPrototypes(string xmlPrototype)
-		// {
-		// 	XmlDocument doc = new XmlDocument();
-		// 	doc.LoadXml(xmlPrototype);
-
-		// 	// Entity prototypes
-		// 	foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entityproto") ?? throw new Exception("Prototype XML error"))
-		// 	{
-		// 		// TODO: Params
-
-		// 		List<string> inheritFrom = new List<string>();
-		// 		foreach (XmlNode parentNode in prototypeNode.SelectNodes("./inherit") ?? throw new Exception("Prototype XML error"))
-		// 		{
-		// 			inheritFrom.Add(parentNode.InnerText);
-		// 		}
-
-		// 		List<ComponentPrototype> components = new List<ComponentPrototype>();
-		// 		foreach (XmlNode componentNode in prototypeNode.SelectNodes("./entity/component") ?? throw new Exception("Prototype XML error"))
-		// 		{
-		// 			// TODO: Properties
-		// 			Dictionary<string, PrototypeParameter> properties = new Dictionary<string, PrototypeParameter>();
-
-		// 			components.Add(new ComponentPrototype(
-		// 				((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).InnerText, properties));
-		// 		}
-
-		// 		EntityPrototype entityPrototype = new EntityPrototype(
-		// 			((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).InnerText,
-		// 			components, inheritFrom);
-		// 		entityPrototypes.Add(entityPrototype.name, entityPrototype);
-		// 	}
-
-		// 	// Entity group prototypes
-		// 	foreach (XmlNode prototypeNode in doc.SelectNodes("/protos/entitygroupproto") ?? throw new Exception("Prototype XML error"))
-		// 	{
-		// 		EntityGroupPrototype prototype = new EntityGroupPrototype();
-		// 		string prototypeName = ((prototypeNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
-		// 		Console.WriteLine("Registering prototype: " + prototypeName);
-		// 		foreach (XmlNode entityNode in prototypeNode.SelectNodes("./entities/entity") ?? throw new Exception("Prototype XML error"))
-		// 		{
-		// 			List<ComponentPrototype> componentPrototypes = new List<ComponentPrototype>();
-		// 			string entityName = ((entityNode.Attributes ?? throw new Exception("Prototype XML error"))["name"] ?? throw new Exception("Prototype XML error")).Value;
-		// 			Console.WriteLine("  Entity with components:");
-		// 			foreach (XmlNode componentNode in entityNode.SelectNodes("./component") ?? throw new Exception("Prototype XML error"))
-		// 			{
-		// 				string prototypeType = ((componentNode.Attributes ?? throw new Exception("Prototype XML error"))["type"] ?? throw new Exception("Prototype XML error")).Value;
-		// 				Console.WriteLine("    " + prototypeType);
-		// 				ComponentPrototype componentPrototype = new ComponentPrototype(prototypeType);
-		// 				componentPrototypes.Add(componentPrototype);
-		// 			}
-		// 			prototype.entityList.Add(new EntityPrototype(entityName, componentPrototypes));
-		// 		}
-		// 		entityGroupPrototypes.Add(prototypeName, prototype);
-		// 	}
-		// }
-
 		public object? ParseJSONParam(JsonElement json, Type desiredType)
 		{
 			foreach (Func<JsonElement, Type, object?> parser in jsonParsers)
@@ -275,6 +214,27 @@ namespace OnionEngine.Prototypes
 			}
 		}
 
+		/// <summary>
+		/// Load all prototype files (JSON) in directory with specified relative path, including subdirectories.
+		/// </summary>
+		/// <param name="relativeDirectoryPath">Relative path to directory containing prototype files.</param>
+		public void LoadPrototypesFromDirectory(string relativeDirectoryPath)
+		{
+			string fullPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+			foreach (string file in Directory.EnumerateFiles(fullPath, "*.json", SearchOption.AllDirectories))
+			{
+				LoadPrototypes(File.ReadAllText(file));
+			}
+		}
+
+		/// <summary>
+		/// Spawn entity prototype.
+		/// </summary>
+		/// <param name="prototypeName">Name of prototype to spawn</param>
+		/// <returns>Entity id</returns>
+		/// <exception cref="Exception"></exception>
+		/// <remarks>Should be moved into more appropriate place</remarks>
 		public Int64 SpawnEntityPrototype(string prototypeName)
 		{
 			EntityPrototype prototype = entityPrototypes[prototypeName];
@@ -320,6 +280,7 @@ namespace OnionEngine.Prototypes
 		/// <param name="gameManager"><c>GameManager</c> to spawn the prototype in</param>
 		/// <param name="prototypeName">Name of prototype to spawn</param>
 		/// <returns></returns>
+		/// <remarks>Doesn't fully work now. Should be moved into more appropriate place.</remarks>
 		public List<Int64> SpawnEntityGroupPrototype(string prototypeName)
 		{
 			EntityGroupPrototype prototype = entityGroupPrototypes[prototypeName];

@@ -7,6 +7,8 @@ using OpenTK.Windowing.Desktop;
 
 namespace OnionEngine.Graphics
 {
+	public delegate void RenderDelegate();
+
 	/// <summary>
 	/// Game window, rendering graphics and executing logic.
 	/// </summary>
@@ -23,8 +25,16 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public List<TextureAtlas> textureAtlases = new List<TextureAtlas>();
 
+		/// <summary>
+		/// This event will be fired after window has been loaded.
+		/// OpenGL, texture atlases and shaders will be ready before this event is fired.
+		/// </summary>
 		public Event<object?> afterLoadEvent = new Event<object?>();
 
+		/// <summary>
+		/// This event is fired every frame.
+		/// Appropriate entity systems should update <c>renderData</c> field of <c>RenderComponent</c> when this event is fired.
+		/// </summary>
 		public Event<object?> drawSpritesEvent = new Event<object?>();
 
 		// OpenGL stuff
