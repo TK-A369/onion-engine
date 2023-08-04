@@ -10,6 +10,6 @@ namespace OnionEngine.Graphics
 		[PrototypeParameter(true)]
 		public int size;
 		[PrototypeParameter(true)]
-		public Dictionary<string, string> textures = new Dictionary<string, string>();
+		public Dictionary<string, string> textures = new();
 	}
 }

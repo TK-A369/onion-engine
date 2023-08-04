@@ -31,7 +31,7 @@ namespace OnionEngine.Graphics
 
 		public override void OnCreate()
 		{
-			textureTransform = window.textureAtlases[0].texturesTransformations[spriteComponent.textureName ?? throw new Exception("Texture name is null")];
+			textureTransform = window.textureAtlases["texture-atlas-test"].texturesTransformations[spriteComponent.textureName ?? throw new Exception("Texture name is null")];
 
 			drawSpriteSubscriber = (_) =>
 			{

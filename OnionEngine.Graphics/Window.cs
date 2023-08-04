@@ -1,5 +1,6 @@
 using OnionEngine.Core;
 using OnionEngine.IoC;
+using OnionEngine.Prototypes;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -23,19 +24,19 @@ namespace OnionEngine.Graphics
 		/// List of texture atlases.
 		/// WIP.
 		/// </summary>
-		public List<TextureAtlas> textureAtlases = new List<TextureAtlas>();
+		public Dictionary<string, TextureAtlas> textureAtlases = new();
 
 		/// <summary>
 		/// This event will be fired after window has been loaded.
 		/// OpenGL, texture atlases and shaders will be ready before this event is fired.
 		/// </summary>
-		public Event<object?> afterLoadEvent = new Event<object?>();
+		public Event<object?> afterLoadEvent = new();
 
 		/// <summary>
 		/// This event is fired every frame.
 		/// Appropriate entity systems should update <c>renderData</c> field of <c>RenderComponent</c> when this event is fired.
 		/// </summary>
-		public Event<object?> drawSpritesEvent = new Event<object?>();
+		public Event<object?> drawSpritesEvent = new();
 
 		// OpenGL stuff
 
@@ -65,18 +66,21 @@ namespace OnionEngine.Graphics
 		/// <summary>
 		/// Dictionary of shaders by their names.
 		/// </summary>
-		Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
+		private Dictionary<string, Shader> shaders = new();
 
 		/// <summary>
 		/// Dictionary of render groups by their names.
 		/// </summary>
-		Dictionary<string, RenderGroup> renderGroups = new Dictionary<string, RenderGroup>();
+		private Dictionary<string, RenderGroup> renderGroups = new();
 
 		/// <summary>
 		/// <c>GameManager</c> object used by this window.
 		/// </summary>
 		[Dependency]
-		GameManager gameManager = default!;
+		private GameManager gameManager = default!;
+
+		[Dependency]
+		private PrototypeManager prototypeManager = default!;
 
 		public Window(int _width, int _height, string title)
 			: base(
@@ -118,7 +122,7 @@ namespace OnionEngine.Graphics
 
 		protected override void OnLoad()
 		{
-			textureAtlases.Add(new TextureAtlas(128, new Dictionary<string, string>() {
+			textureAtlases.Add("texture-atlas-test", new TextureAtlas(128, new Dictionary<string, string>() {
 				{"human-1","Resources/Textures/human-1.png"},
 				{"floor-tile-1","Resources/Textures/floor-tile-1.png"},
 				{"smiling-ball-1","Resources/Textures/smiling-ball-1.png"},
@@ -130,6 +134,12 @@ namespace OnionEngine.Graphics
 				{"floor-tile-3","Resources/Textures/floor-tile-1.png"},
 				{"floor-tile-4","Resources/Textures/floor-tile-1.png"}
 			}));
+
+			foreach (var (_, prototype) in prototypeManager.prototypesByType[typeof(TextureAtlasPrototype)])
+			{
+				TextureAtlasPrototype textureAtlasPrototype = (TextureAtlasPrototype)prototype;
+				textureAtlases.Add(textureAtlasPrototype.name, new TextureAtlas(textureAtlasPrototype.size, textureAtlasPrototype.textures));
+			}
 
 			float[] triangle =
 			{
@@ -242,7 +252,7 @@ namespace OnionEngine.Graphics
 			GL.BindVertexArray(vertexArrayObject);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
 			shaders["textured-shader"].Use();
-			textureAtlases[0].Use();
+			textureAtlases["texture-atlas-test"].Use();
 			// textures["floor-tile-1"].Use(TextureUnit.Texture0);
 			shaders["textured-shader"].SetUniform1i("texture0", 0);
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);

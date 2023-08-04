@@ -16,18 +16,18 @@ namespace OnionEngine.Prototypes
 		/// <summary>
 		/// Dictionary of entity group prototypes by their names.
 		/// </summary>
-		public Dictionary<string, EntityGroupPrototype> entityGroupPrototypes = new Dictionary<string, EntityGroupPrototype>();
+		public Dictionary<string, EntityGroupPrototype> entityGroupPrototypes = new();
 
 		/// <summary>
 		/// Dictionary of entity prototypes by their names.
 		/// </summary>
-		public Dictionary<string, EntityPrototype> entityPrototypes = new Dictionary<string, EntityPrototype>();
+		public Dictionary<string, EntityPrototype> entityPrototypes = new();
 
-		public Dictionary<string, Prototype> prototypes = new Dictionary<string, Prototype>();
+		public Dictionary<string, Prototype> prototypes = new();
 
-		public Dictionary<Type, Dictionary<string, Prototype>> prototypesByType = new Dictionary<Type, Dictionary<string, Prototype>>();
+		public Dictionary<Type, Dictionary<string, Prototype>> prototypesByType = new();
 
-		private Dictionary<string, Type> prototypeTypes = new Dictionary<string, Type>();
+		private Dictionary<string, Type> prototypeTypes = new();
 
 		public List<Func<JsonElement, Type, object?>> jsonParsers;
 
@@ -117,7 +117,7 @@ namespace OnionEngine.Prototypes
 						string componentTypeName = e.GetProperty("type").GetString() ?? throw new Exception("Component type not provided in JSON");
 						Type componentType = gameManager.GetComponentTypeByName(componentTypeName);
 
-						Dictionary<string, ComponentProperty> parameters = new Dictionary<string, ComponentProperty>();
+						Dictionary<string, ComponentProperty> parameters = new();
 						foreach(JsonProperty keyValuePair in e.EnumerateObject()) {
 							if(keyValuePair.Name != "type")
 							{
@@ -128,7 +128,7 @@ namespace OnionEngine.Prototypes
 											ParseJSONParam(keyValuePair.Value, fieldType) ?? throw new Exception("Couldn't parse value for field " + keyValuePair.Name + " of type " + fieldType)));
 							}
 						}
-						ComponentDescriptor componentDescriptor = new ComponentDescriptor(componentTypeName, parameters);
+						ComponentDescriptor componentDescriptor = new(componentTypeName, parameters);
 						return componentDescriptor;
 					}
 					return null;
@@ -220,10 +220,12 @@ namespace OnionEngine.Prototypes
 		/// <param name="relativeDirectoryPath">Relative path to directory containing prototype files.</param>
 		public void LoadPrototypesFromDirectory(string relativeDirectoryPath)
 		{
-			string fullPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+			string execPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? throw new Exception("Couldn't determine directory in which executable is");
+			string fullPath = System.IO.Path.Combine(execPath, relativeDirectoryPath);
 
 			foreach (string file in Directory.EnumerateFiles(fullPath, "*.json", SearchOption.AllDirectories))
 			{
+				Console.WriteLine("Loading prototypes file " + file);
 				LoadPrototypes(File.ReadAllText(file));
 			}
 		}
@@ -285,7 +287,7 @@ namespace OnionEngine.Prototypes
 		{
 			EntityGroupPrototype prototype = entityGroupPrototypes[prototypeName];
 
-			List<Int64> entitiesIds = new List<Int64>();
+			List<Int64> entitiesIds = new();
 
 			// TODO: Remake, so it uses SpawnEntityPrototype
 
