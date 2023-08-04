@@ -132,6 +132,21 @@ namespace OnionEngine.Prototypes
 						return componentDescriptor;
 					}
 					return null;
+				},
+				(JsonElement e, Type t) => {
+					if(t.IsDefined(typeof(PrototypeJSONAutoparseAttribute))) {
+						// WIP
+						foreach(FieldInfo fieldInfo in t.GetFields()) {
+							if(fieldInfo.IsDefined(typeof(PrototypeJSONAutoparsedFieldAttribute))) {
+								PrototypeJSONAutoparsedFieldAttribute fieldAttribute = fieldInfo.GetCustomAttribute<PrototypeJSONAutoparsedFieldAttribute>()!;
+								string propertyName = fieldAttribute.nameOverride ?? fieldInfo.Name;
+								if(e.TryGetProperty(propertyName, out JsonElement propertyValue)) {
+									fieldInfo.SetValue()
+								}
+							}
+						}
+					}
+					return null;
 				}
 			};
 		}
