@@ -21,12 +21,6 @@ namespace OnionEngine.Graphics
 		public int width, height;
 
 		/// <summary>
-		/// List of texture atlases.
-		/// WIP.
-		/// </summary>
-		public Dictionary<string, TextureAtlas> textureAtlases = new();
-
-		/// <summary>
 		/// This event will be fired after window has been loaded.
 		/// OpenGL, texture atlases and shaders will be ready before this event is fired.
 		/// </summary>
@@ -72,6 +66,16 @@ namespace OnionEngine.Graphics
 		/// Dictionary of render groups by their names.
 		/// </summary>
 		private Dictionary<string, RenderGroup> renderGroups = new();
+
+		/// <summary>
+		/// Dictionary of texture atlases by their names.
+		/// </summary>
+		public Dictionary<string, TextureAtlas> textureAtlases = new();
+
+		/// <summary>
+		/// Dictionary of offscreen render targets by their names.
+		/// </summary>
+		public Dictionary<string, OffscreenRenderTarget> offscreenRenderTargets = new();
 
 		/// <summary>
 		/// <c>GameManager</c> object used by this window.
@@ -135,13 +139,22 @@ namespace OnionEngine.Graphics
 				{"floor-tile-4","Resources/Textures/floor-tile-1.png"}
 			}));
 
+			// Create texture atlases based on prototypes
 			foreach (var (_, prototype) in prototypeManager.prototypesByType[typeof(TextureAtlasPrototype)])
 			{
 				TextureAtlasPrototype textureAtlasPrototype = (TextureAtlasPrototype)prototype;
 				textureAtlases.Add(textureAtlasPrototype.name, new TextureAtlas(textureAtlasPrototype.size, textureAtlasPrototype.textures));
 			}
 
-			float[] triangle =
+			// Create offscreen render targets based on prototypes
+			foreach (var (_, prototype) in prototypeManager.prototypesByType[typeof(TextureAtlasPrototype)])
+			{
+				OffscreenRenderTargetPrototype offscreenRenderTargetPrototype = (OffscreenRenderTargetPrototype)prototype;
+				offscreenRenderTargets.Add(
+					offscreenRenderTargetPrototype.name, new OffscreenRenderTarget(offscreenRenderTargetPrototype.width, offscreenRenderTargetPrototype.height));
+			}
+
+			float[] vertexData =
 			{
             // x        y      z      r     g     b      texX,  texY
               -0.75f,  -0.75f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f,  0.0f,
@@ -157,7 +170,7 @@ namespace OnionEngine.Graphics
 
 			GL.BindVertexArray(vertexArrayObject);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
-			GL.BufferData(BufferTarget.ArrayBuffer, triangle.Length * sizeof(float), triangle, BufferUsageHint.DynamicDraw);
+			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Length * sizeof(float), vertexData, BufferUsageHint.DynamicDraw);
 			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
 			GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
 			GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
@@ -252,7 +265,7 @@ namespace OnionEngine.Graphics
 			GL.BindVertexArray(vertexArrayObject);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
 			shaders["textured-shader"].Use();
-			textureAtlases["texture-atlas-test"].Use();
+			textureAtlases["texture-atlas-1"].Use();
 			// textures["floor-tile-1"].Use(TextureUnit.Texture0);
 			shaders["textured-shader"].SetUniform1i("texture0", 0);
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
