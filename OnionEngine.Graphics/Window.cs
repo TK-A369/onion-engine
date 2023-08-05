@@ -46,7 +46,7 @@ namespace OnionEngine.Graphics
 		/// <remarks>
 		/// To be deleted. Instead, render groups will be used.
 		/// </remarks>
-		private int vertexArrayObject;
+		public int vertexArrayObject;
 
 		/// <summary>
 		/// Handle to VBO.
@@ -55,17 +55,17 @@ namespace OnionEngine.Graphics
 		/// <remarks>
 		/// To be deleted. Instead, render groups will be used.
 		/// </remarks>
-		private int vertexBufferObject;
+		public int vertexBufferObject;
 
 		/// <summary>
 		/// Dictionary of shaders by their names.
 		/// </summary>
-		private Dictionary<string, Shader> shaders = new();
+		public Dictionary<string, Shader> shaders = new();
 
 		/// <summary>
 		/// Dictionary of render groups by their names.
 		/// </summary>
-		private Dictionary<string, RenderGroup> renderGroups = new();
+		public Dictionary<string, RenderGroup> renderGroups = new();
 
 		/// <summary>
 		/// Dictionary of texture atlases by their names.
@@ -76,6 +76,11 @@ namespace OnionEngine.Graphics
 		/// Dictionary of offscreen render targets by their names.
 		/// </summary>
 		public Dictionary<string, OffscreenRenderTarget> offscreenRenderTargets = new();
+
+		/// <summary>
+		/// This callback in called during render frame.
+		/// </summary>
+		public Action? renderCallback = null;
 
 		/// <summary>
 		/// <c>GameManager</c> object used by this window.
@@ -152,6 +157,22 @@ namespace OnionEngine.Graphics
 					prototype.name, new OffscreenRenderTarget(prototype.width, prototype.height));
 			}
 
+			// Create shaders based on prototypes
+			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<ShaderPrototype>())
+			{
+				shaders.Add(
+					prototype.name, new Shader(prototype.vertexPath, prototype.fragmentPath));
+			}
+
+			// Create render groups based on prototypes
+			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<RenderGroupPrototype>())
+			{
+				renderGroups.Add(prototype.name, new RenderGroup(
+					shaders[prototype.shaderName],
+					prototype.vertexAttributeDescriptors,
+					prototype.textureAtlasName));
+			}
+
 			float[] vertexData =
 			{
             // x        y      z      r     g     b      texX,  texY
@@ -176,29 +197,6 @@ namespace OnionEngine.Graphics
 			GL.EnableVertexAttribArray(1);
 			GL.EnableVertexAttribArray(2);
 
-			shaders["basic-shader"] = new Shader("Resources/Shaders/basic_shader.vert", "Resources/Shaders/basic_shader.frag");
-			shaders["textured-shader"] = new Shader("Resources/Shaders/textured_shader.vert", "Resources/Shaders/textured_shader.frag");
-
-			renderGroups = new Dictionary<string, RenderGroup>()
-			{
-				["basic-group"] = new RenderGroup(
-					shaders["basic-shader"],
-					new List<VertexAttributeDescriptor>()
-					{
-						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false },
-						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false }
-					}),
-				["textured-group"] = new RenderGroup(
-					shaders["textured-shader"],
-					new List<VertexAttributeDescriptor>()
-					{
-						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false },
-						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 4, normalized = false },
-						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 2, normalized = false }
-					},
-					"texture-atlas-1")
-			};
-
 			afterLoadEvent.Fire(null);
 		}
 
@@ -221,70 +219,7 @@ namespace OnionEngine.Graphics
 
 		protected override void OnRenderFrame(FrameEventArgs args)
 		{
-			HashSet<Int64> entitiesToRender = gameManager.QueryEntitiesOwningComponents(new HashSet<Type>() { typeof(RenderComponent) });
-			foreach (Int64 entity in entitiesToRender)
-			{
-				Int64 renderComponentId = gameManager.GetComponent(entity, typeof(RenderComponent));
-				RenderComponent renderComponent = (gameManager.components[renderComponentId] as RenderComponent) ?? throw new NullReferenceException();
-				renderComponent.renderData.Clear();
-			}
-
-			drawSpritesEvent.Fire(null);
-
-			// Clear render groups' vertices data
-			foreach (RenderGroup renderGroup in renderGroups.Values)
-			{
-				renderGroup.vertices.Clear();
-				renderGroup.indices.Clear();
-			}
-
-			// Add vertices to appropriate render groups
-			foreach (Int64 entity in entitiesToRender)
-			{
-				Int64 renderComponentId = gameManager.GetComponent(entity, typeof(RenderComponent));
-				RenderComponent renderComponent = (gameManager.components[renderComponentId] as RenderComponent) ?? throw new NullReferenceException();
-				List<RenderData> dataToRender = renderComponent.GetVertices();
-				foreach (RenderData renderData in dataToRender)
-				{
-					RenderGroup renderGroup = renderGroups[renderData.renderGroup];
-					int indexOffset = renderGroup.vertices.Count / 6;
-					foreach (float vertex in renderData.vertices)
-					{
-						renderGroup.vertices.Add(vertex);
-					}
-					foreach (int index in renderData.indices)
-					{
-						renderGroup.indices.Add(index + indexOffset);
-					}
-				}
-			}
-
-			offscreenRenderTargets["offscreen-render-target-1"].Clear();
-			foreach (RenderGroup renderGroup in renderGroups.Values)
-			{
-				renderGroup.Render(offscreenRenderTargets["offscreen-render-target-1"]);
-			}
-
-			// Render to default framebuffer - onscreen
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-			GL.Viewport(0, 0, width, height);
-
-			// Clear
-			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
-
-			GL.BindVertexArray(vertexArrayObject);
-			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
-			shaders["textured-shader"].Use();
-			textureAtlases["texture-atlas-1"].Use();
-			offscreenRenderTargets["offscreen-render-target-1"].UseTexture();
-			// textures["floor-tile-1"].Use(TextureUnit.Texture0);
-			shaders["textured-shader"].SetUniform1i("texture0", 0);
-			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
-
-
-
-			Context.SwapBuffers();
+			renderCallback?.Invoke();
 
 			base.OnRenderFrame(args);
 		}

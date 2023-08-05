@@ -1,10 +1,10 @@
+using OnionEngine.Core;
+using OnionEngine.IoC;
+
 using System.Reflection;
 using System.Xml;
 using System.Text.Json;
 using System.Globalization;
-
-using OnionEngine.Core;
-using OnionEngine.IoC;
 
 namespace OnionEngine.Prototypes
 {
@@ -146,6 +146,12 @@ namespace OnionEngine.Prototypes
 							}
 						}
 						return result;
+					}
+					return null;
+				},
+				(JsonElement e, Type t) => {
+					if(t.IsEnum) {
+						return Enum.Parse(t, e.ToString());
 					}
 					return null;
 				}
@@ -332,7 +338,7 @@ namespace OnionEngine.Prototypes
 		public Dictionary<string, T> GetPrototypesOfType<T>() where T : Prototype
 		{
 			Dictionary<string, Prototype> prototypesOfThatType = GetPrototypesOfType(typeof(T));
-			Dictionary<string, T> result = new Dictionary<string, T>();
+			Dictionary<string, T> result = new();
 			foreach (var (key, value) in prototypesOfThatType)
 			{
 				result.Add(key, (T)value);

@@ -1,5 +1,6 @@
 using OnionEngine.Core;
 using OnionEngine.IoC;
+using OnionEngine.Prototypes;
 
 using OpenTK.Graphics.OpenGL4;
 
@@ -21,11 +22,17 @@ namespace OnionEngine.Graphics
 	/// Struct describing vertex attributes.
 	/// For example position is usually float*3 or float*2.
 	/// </summary>
+	[PrototypeJSONAutoparse]
 	public struct VertexAttributeDescriptor
 	{
+		[PrototypeJSONAutoparsedField]
 		public VertexAttribPointerType type;
+		[PrototypeJSONAutoparsedField]
 		public int valuesCount;
-		public bool normalized;
+		[PrototypeJSONAutoparsedField(false)]
+		public bool normalized = false;
+
+		public VertexAttributeDescriptor() { }
 	}
 
 	/// <summary>
