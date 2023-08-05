@@ -9,25 +9,23 @@ namespace OnionEngine.Graphics
 	public class SpriteEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		SpriteComponent spriteComponent = default!;
+		private SpriteComponent spriteComponent = default!;
 
 		[EntitySystemDependency]
-		PositionComponent positionComponent = default!;
+		private PositionComponent positionComponent = default!;
 
 		[EntitySystemDependency]
-		RenderComponent renderComponent = default!;
+		private RenderComponent renderComponent = default!;
 
 		[Dependency]
-		Window window = default!;
+		private Window window = default!;
 
 		[Dependency]
-		GameManager gameManager = default!;
+		private GameManager gameManager = default!;
 
-		Mat<float> textureTransform = new Mat<float>(3, 3);
+		private Mat<float> textureTransform = new(3, 3);
 
-		int textureAtlasId = 0;
-
-		Action<object?>? drawSpriteSubscriber;
+		private Action<object?>? drawSpriteSubscriber;
 
 		public override void OnCreate()
 		{
@@ -41,7 +39,6 @@ namespace OnionEngine.Graphics
 					Int64 rotationComponentId = gameManager.GetComponent(spriteComponent.entityId, typeof(RotationComponent));
 					RotationComponent rotationComponent = (RotationComponent)gameManager.components[rotationComponentId];
 					rotation = rotationComponent.rotation;
-					rotationComponent.rotation += 0.005;
 				}
 
 				Mat<float> positionGlobalMat = positionComponent.position.ToMatTransform().Cast<float>();
@@ -60,7 +57,7 @@ namespace OnionEngine.Graphics
 				Mat<float> texCoordsNEMat = textureTransform * new Vec2<float>(1, 1).ToMatVertical();
 				Mat<float> texCoordsSEMat = textureTransform * new Vec2<float>(1, 0).ToMatVertical();
 
-				RenderData renderData = new RenderData()
+				RenderData renderData = new()
 				{
 					vertices = new List<float>()
 					{
@@ -75,8 +72,6 @@ namespace OnionEngine.Graphics
 				};
 
 				renderComponent.renderData.Add(renderData);
-
-				positionComponent.position.x += 0.001;
 			};
 			window.drawSpritesEvent.RegisterSubscriber(new EventSubscriber<object?>(drawSpriteSubscriber));
 

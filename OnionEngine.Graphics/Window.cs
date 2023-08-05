@@ -32,6 +32,8 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public Event<object?> drawSpritesEvent = new();
 
+		public Event<object?> updateFrameEvent = new();
+
 		// OpenGL stuff
 
 		/// <summary>
@@ -213,6 +215,8 @@ namespace OnionEngine.Graphics
 		{
 			// renderGroups["basic-group"].vertices[18] += (float)e.Time * 0.025f;
 			// renderGroups["basic-group"].vertices[19] += (float)e.Time * 0.05f;
+
+			updateFrameEvent.Fire(null);
 
 			base.OnUpdateFrame(e);
 		}

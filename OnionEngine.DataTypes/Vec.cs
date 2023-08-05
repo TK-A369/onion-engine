@@ -18,7 +18,7 @@ namespace OnionEngine.DataTypes
 
 		public Mat<T> ToMatVertical()
 		{
-			Mat<T> mat = new Mat<T>(3, 1);
+			Mat<T> mat = new(3, 1);
 			mat.Element(0, 0) = x;
 			mat.Element(1, 0) = y;
 			mat.Element(2, 0) = (T)(dynamic)1.0;
@@ -27,7 +27,7 @@ namespace OnionEngine.DataTypes
 
 		public Mat<T> ToMatTransform()
 		{
-			Mat<T> mat = new Mat<T>(3, 3);
+			Mat<T> mat = new(3, 3);
 			mat.Element(0, 0) = (T)(dynamic)1.0;
 			mat.Element(0, 1) = (T)(dynamic)0.0;
 			mat.Element(0, 2) = x;
@@ -39,5 +39,7 @@ namespace OnionEngine.DataTypes
 			mat.Element(2, 2) = (T)(dynamic)1.0;
 			return mat;
 		}
+
+		public static Vec2<T> operator +(Vec2<T> a, Vec2<T> b) => new(a.x + b.x, a.y + b.y);
 	}
 }

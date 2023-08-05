@@ -8,13 +8,13 @@ namespace OnionEngine.Physics
 	/// Entity system that moves physical bodies.
 	/// </summary>
 	[EntitySystem]
-	public class PhysicalBodyEntitySystem : EntitySystem
+	public class RigidBodyEntitySystem : EntitySystem
 	{
 		[EntitySystemDependency]
-		PositionComponent positionComponent = default!;
+		RotationComponent rotationComponent = default!;
 
 		[EntitySystemDependency]
-		PhysicalBodyComponent physicalBodyComponent = default!;
+		RigidBodyComponent rigidBodyComponent = default!;
 
 		[Dependency]
 		Window window = default!;
@@ -28,7 +28,7 @@ namespace OnionEngine.Physics
 
 		public void OnUpdateFrame(object? _)
 		{
-			positionComponent.position += physicalBodyComponent.velocity;
+			rotationComponent.rotation += rigidBodyComponent.angularVelocity;
 		}
 	}
 }
