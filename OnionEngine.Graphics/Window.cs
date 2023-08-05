@@ -140,18 +140,16 @@ namespace OnionEngine.Graphics
 			}));
 
 			// Create texture atlases based on prototypes
-			foreach (var (_, prototype) in prototypeManager.prototypesByType[typeof(TextureAtlasPrototype)])
+			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<TextureAtlasPrototype>())
 			{
-				TextureAtlasPrototype textureAtlasPrototype = (TextureAtlasPrototype)prototype;
-				textureAtlases.Add(textureAtlasPrototype.name, new TextureAtlas(textureAtlasPrototype.size, textureAtlasPrototype.textures));
+				textureAtlases.Add(prototype.name, new TextureAtlas(prototype.size, prototype.textures));
 			}
 
 			// Create offscreen render targets based on prototypes
-			foreach (var (_, prototype) in prototypeManager.prototypesByType[typeof(TextureAtlasPrototype)])
+			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<OffscreenRenderTargetPrototype>())
 			{
-				OffscreenRenderTargetPrototype offscreenRenderTargetPrototype = (OffscreenRenderTargetPrototype)prototype;
 				offscreenRenderTargets.Add(
-					offscreenRenderTargetPrototype.name, new OffscreenRenderTarget(offscreenRenderTargetPrototype.width, offscreenRenderTargetPrototype.height));
+					prototype.name, new OffscreenRenderTarget(prototype.width, prototype.height));
 			}
 
 			float[] vertexData =

@@ -25,7 +25,7 @@ namespace OnionEngine.Prototypes
 
 		public Dictionary<string, Prototype> prototypes = new();
 
-		public Dictionary<Type, Dictionary<string, Prototype>> prototypesByType = new();
+		private Dictionary<Type, Dictionary<string, Prototype>> prototypesByType = new();
 
 		private Dictionary<string, Type> prototypeTypes = new();
 
@@ -135,16 +135,17 @@ namespace OnionEngine.Prototypes
 				},
 				(JsonElement e, Type t) => {
 					if(t.IsDefined(typeof(PrototypeJSONAutoparseAttribute))) {
-						// WIP
+						object result = IoCManager.CreateInstance(t, new object[]{});
 						foreach(FieldInfo fieldInfo in t.GetFields()) {
 							if(fieldInfo.IsDefined(typeof(PrototypeJSONAutoparsedFieldAttribute))) {
 								PrototypeJSONAutoparsedFieldAttribute fieldAttribute = fieldInfo.GetCustomAttribute<PrototypeJSONAutoparsedFieldAttribute>()!;
 								string propertyName = fieldAttribute.nameOverride ?? fieldInfo.Name;
 								if(e.TryGetProperty(propertyName, out JsonElement propertyValue)) {
-									fieldInfo.SetValue()
+									fieldInfo.SetValue(result, ParseJSONParam(propertyValue, fieldInfo.FieldType));
 								}
 							}
 						}
+						return result;
 					}
 					return null;
 				}
@@ -323,6 +324,20 @@ namespace OnionEngine.Prototypes
 			}
 
 			return entitiesIds;
+		}
+
+		public Dictionary<string, Prototype> GetPrototypesOfType(Type type)
+			=> prototypesByType.ContainsKey(type) ? prototypesByType[type] : new Dictionary<string, Prototype>();
+
+		public Dictionary<string, T> GetPrototypesOfType<T>() where T : Prototype
+		{
+			Dictionary<string, Prototype> prototypesOfThatType = GetPrototypesOfType(typeof(T));
+			Dictionary<string, T> result = new Dictionary<string, T>();
+			foreach (var (key, value) in prototypesOfThatType)
+			{
+				result.Add(key, (T)value);
+			}
+			return result;
 		}
 	}
 }
