@@ -63,6 +63,8 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new List<VertexAttributeDescriptor>();
 
+		public string? textureAtlasName = null;
+
 		/// <summary>
 		/// If OpenGL buffers were disposed
 		/// </summary>
@@ -81,12 +83,13 @@ namespace OnionEngine.Graphics
 		[Dependency]
 		Window window = default!;
 
-		public RenderGroup(Shader _shader, List<VertexAttributeDescriptor> _vertexAttributesDescriptors)
+		public RenderGroup(Shader _shader, List<VertexAttributeDescriptor> _vertexAttributesDescriptors, string? _textureAtlasName = null)
 		{
 			IoCManager.InjectDependencies(this);
 
 			shader = _shader;
 			vertexAttributesDescriptors = _vertexAttributesDescriptors;
+			textureAtlasName = _textureAtlasName;
 
 			// Generate OpenGL buffers
 			vertexArrayObject = GL.GenVertexArray();
@@ -191,6 +194,9 @@ namespace OnionEngine.Graphics
 				GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 				GL.Viewport(0, 0, window.width, window.height);
 			}
+
+			if (textureAtlasName != null)
+				window.textureAtlases[textureAtlasName].Use();
 
 			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), BufferUsageHint.StreamDraw);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.StreamDraw);

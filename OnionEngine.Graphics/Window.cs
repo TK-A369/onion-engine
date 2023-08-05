@@ -195,7 +195,8 @@ namespace OnionEngine.Graphics
 						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 3, normalized = false },
 						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 4, normalized = false },
 						new VertexAttributeDescriptor() { type = VertexAttribPointerType.Float, valuesCount = 2, normalized = false }
-					})
+					},
+					"texture-atlas-1")
 			};
 
 			afterLoadEvent.Fire(null);
@@ -205,6 +206,8 @@ namespace OnionEngine.Graphics
 		protected override void OnResize(ResizeEventArgs e)
 		{
 			base.OnResize(e);
+			width = e.Width;
+			height = e.Height;
 			GL.Viewport(0, 0, e.Width, e.Height);
 		}
 
@@ -256,6 +259,16 @@ namespace OnionEngine.Graphics
 				}
 			}
 
+			offscreenRenderTargets["offscreen-render-target-1"].Clear();
+			foreach (RenderGroup renderGroup in renderGroups.Values)
+			{
+				renderGroup.Render(offscreenRenderTargets["offscreen-render-target-1"]);
+			}
+
+			// Render to default framebuffer - onscreen
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			GL.Viewport(0, 0, width, height);
+
 			// Clear
 			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -264,14 +277,12 @@ namespace OnionEngine.Graphics
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
 			shaders["textured-shader"].Use();
 			textureAtlases["texture-atlas-1"].Use();
+			offscreenRenderTargets["offscreen-render-target-1"].UseTexture();
 			// textures["floor-tile-1"].Use(TextureUnit.Texture0);
 			shaders["textured-shader"].SetUniform1i("texture0", 0);
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
-			foreach (RenderGroup renderGroup in renderGroups.Values)
-			{
-				renderGroup.Render();
-			}
+
 
 			Context.SwapBuffers();
 

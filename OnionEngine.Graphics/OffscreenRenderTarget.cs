@@ -70,6 +70,19 @@ namespace OnionEngine.Graphics
 			GL.Viewport(0, 0, width, height);
 		}
 
+		public void Clear()
+		{
+			Bind();
+			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			GL.Clear(ClearBufferMask.ColorBufferBit);
+		}
+
 		public int GetTextureId() => texture;
+
+		public void UseTexture(TextureUnit unit = TextureUnit.Texture0)
+		{
+			GL.ActiveTexture(unit);
+			GL.BindTexture(TextureTarget.Texture2D, GetTextureId());
+		}
 	}
 }
