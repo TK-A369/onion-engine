@@ -9,7 +9,7 @@ namespace OnionEngine.Graphics
 	/// </summary>
 	public class Shader : IDisposable
 	{
-		int handle;
+		private int handle;
 
 		private bool disposedValue = false;
 

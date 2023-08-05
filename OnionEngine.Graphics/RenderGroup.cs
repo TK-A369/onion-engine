@@ -68,7 +68,7 @@ namespace OnionEngine.Graphics
 		/// <summary>
 		/// List of vertex attributes descriptors
 		/// </summary>
-		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new List<VertexAttributeDescriptor>();
+		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new();
 
 		public string? textureAtlasName = null;
 
@@ -80,15 +80,15 @@ namespace OnionEngine.Graphics
 		/// <summary>
 		/// Vertices data to be rendered
 		/// </summary>
-		public List<float> vertices = new List<float>();
+		public List<float> vertices = new();
 
 		/// <summary>
 		/// Order of vertices
 		/// </summary>
-		public List<int> indices = new List<int>();
+		public List<int> indices = new();
 
 		[Dependency]
-		Window window = default!;
+		private Window window = default!;
 
 		public RenderGroup(Shader _shader, List<VertexAttributeDescriptor> _vertexAttributesDescriptors, string? _textureAtlasName = null)
 		{
@@ -109,7 +109,7 @@ namespace OnionEngine.Graphics
 			// Configure VAO
 			// Firstly, calculate sizes of attributes
 			int totalAttributesSizePerVertex = 0;
-			List<int> attributesSizes = new List<int>();
+			List<int> attributesSizes = new();
 			foreach (VertexAttributeDescriptor desc in vertexAttributesDescriptors)
 			{
 				int attributeSize = 0;
