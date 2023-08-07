@@ -1,3 +1,5 @@
+using OnionEngine.DataTypes;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -111,6 +113,12 @@ namespace OnionEngine.Graphics
 		{
 			int uniformLocation = GL.GetUniformLocation(handle, name);
 			GL.Uniform2(uniformLocation, valueX, valueY);
+		}
+
+		public void SetUniformMat3f(string name, Mat<float> matrix)
+		{
+			int uniformLocation = GL.GetUniformLocation(handle, name);
+			GL.UniformMatrix3(uniformLocation, 1, true, matrix.values);
 		}
 	}
 }

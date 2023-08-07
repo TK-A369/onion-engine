@@ -6,7 +6,7 @@ namespace OnionEngine.DataTypes
 	public struct Mat<T> where T : INumber<T>
 	{
 		public int m, n;
-		T[] values;
+		public T[] values;
 
 		public Mat(int _m, int _n)
 		{
@@ -25,7 +25,7 @@ namespace OnionEngine.DataTypes
 			if (a.n != b.m)
 				throw new Exception("Those matrices (" + a.m + "x" + a.n + ") and (" + b.m + "x" + b.n + ") cannot be multiplied");
 
-			Mat<T> result = new Mat<T>(a.m, b.n);
+			Mat<T> result = new(a.m, b.n);
 			for (int i = 0; i < a.m; i++)
 			{
 				for (int j = 0; j < b.n; j++)
@@ -58,7 +58,7 @@ namespace OnionEngine.DataTypes
 
 		public Mat<T2> Cast<T2>() where T2 : INumber<T2>
 		{
-			Mat<T2> result = new Mat<T2>(m, n);
+			Mat<T2> result = new(m, n);
 			for (int i = 0; i < m; i++)
 			{
 				for (int j = 0; j < n; j++)
@@ -72,7 +72,7 @@ namespace OnionEngine.DataTypes
 
 		public static Mat<T> RotationMatrix(double angle)
 		{
-			Mat<T> result = new Mat<T>(3, 3);
+			Mat<T> result = new(3, 3);
 			result.Element(0, 0) = (T)(dynamic)Math.Cos(angle);
 			result.Element(0, 1) = (T)(dynamic)Math.Sin(angle);
 			result.Element(0, 2) = (T)(dynamic)0.0;

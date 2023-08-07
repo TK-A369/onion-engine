@@ -8,9 +8,8 @@ namespace OnionEngine.Graphics
 	[Component]
 	public sealed class RenderComponent : Component
 	{
-		public List<RenderData> renderData = new List<RenderData>();
+		public List<RenderData> renderData = new();
 
-		int counter = 0;
 		public List<RenderData> GetVertices()
 		{
 			return renderData;
