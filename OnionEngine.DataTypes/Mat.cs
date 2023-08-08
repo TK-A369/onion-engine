@@ -39,6 +39,20 @@ namespace OnionEngine.DataTypes
 			return result;
 		}
 
+		public static Mat<T> operator *(Mat<T> a, T b)
+		{
+			Mat<T> result = new(a.m, a.n);
+			for (int i = 0; i < a.m; i++)
+			{
+				for (int j = 0; j < a.n; j++)
+				{
+					result.Element(i, j) = a.Element(i, j) * b;
+				}
+			}
+
+			return result;
+		}
+
 		public override string ToString()
 		{
 			string result = "";
