@@ -1,6 +1,7 @@
 using OnionEngine.Core;
 using OnionEngine.IoC;
 using OnionEngine.Prototypes;
+using OnionEngine.UserInterface;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -83,12 +84,6 @@ namespace OnionEngine.Graphics
 		/// This callback in called during render frame.
 		/// </summary>
 		public Action? renderCallback = null;
-
-		/// <summary>
-		/// <c>GameManager</c> object used by this window.
-		/// </summary>
-		[Dependency]
-		private GameManager gameManager = default!;
 
 		[Dependency]
 		private PrototypeManager prototypeManager = default!;

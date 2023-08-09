@@ -29,7 +29,7 @@ namespace OnionEngine.UserInterface
 			set
 			{
 				position = value;
-				positionAbsoluteLocal = position.Calculate((parent ?? throw new Exception("Couldn't calculate size of parentless control")).sizeAbsolute.x, parent.sizeAbsolute.y);
+				positionAbsoluteLocal = position.Calculate((parent ?? throw new Exception("Couldn't calculate position of parentless control")).sizeAbsolute.x, parent.sizeAbsolute.y);
 				positionAbsoluteGlobal = positionAbsoluteLocal + parent.positionAbsoluteGlobal;
 			}
 		}
@@ -73,7 +73,16 @@ namespace OnionEngine.UserInterface
 				result.AddRange(child.Render());
 			}
 
+			Console.WriteLine("UI render data:");
+			Console.WriteLine("(" + string.Join("), (", from elem in result select (string.Join(", ", elem.vertices))) + ")");
+
 			return result;
+		}
+
+		public void AddChild(Control child)
+		{
+			children.Add(child);
+			child.parent = this;
 		}
 	}
 }

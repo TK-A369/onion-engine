@@ -8,6 +8,10 @@ namespace OnionEngine.Graphics
 	[EntitySystem]
 	public class SpriteEntitySystem : EntitySystem
 	{
+		private Mat<float> textureTransform = new(3, 3);
+
+		private Action<object?>? drawSpriteSubscriber;
+
 		[EntitySystemDependency]
 		private SpriteComponent spriteComponent = default!;
 
@@ -23,12 +27,10 @@ namespace OnionEngine.Graphics
 		[Dependency]
 		private GameManager gameManager = default!;
 
-		private Mat<float> textureTransform = new(3, 3);
-
-		private Action<object?>? drawSpriteSubscriber;
-
 		public override void OnCreate()
 		{
+			base.OnCreate();
+
 			textureTransform = window.textureAtlases["texture-atlas-test"].texturesTransformations[spriteComponent.textureName ?? throw new Exception("Texture name is null")];
 
 			drawSpriteSubscriber = (_) =>
@@ -74,8 +76,6 @@ namespace OnionEngine.Graphics
 				renderComponent.renderData.Add(renderData);
 			};
 			window.drawSpritesEvent.RegisterSubscriber(new EventSubscriber<object?>(drawSpriteSubscriber));
-
-			base.OnCreate();
 		}
 	}
 }

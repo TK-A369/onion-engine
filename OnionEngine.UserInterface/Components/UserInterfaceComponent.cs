@@ -8,9 +8,6 @@ namespace OnionEngine.UserInterface
 	/// </summary>
 	public sealed class UserInterfaceComponent : Component
 	{
-		/// <summary>
-		/// Dictionary of root controls (windows) by their names.
-		/// </summary>
-		public Dictionary<string, RootControl> controls = new Dictionary<string, RootControl>();
+		public RootControl uiRootControl = new();
 	}
 }
