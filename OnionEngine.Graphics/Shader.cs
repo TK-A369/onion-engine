@@ -11,12 +11,19 @@ namespace OnionEngine.Graphics
 	/// </summary>
 	public class Shader : IDisposable
 	{
+		/// <summary>
+		/// List of vertex attributes descriptors.
+		/// </summary>
+		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new();
+
 		private int handle;
 
 		private bool disposedValue = false;
 
-		public Shader(string vertexPath, string fragmentPath)
+		public Shader(string vertexPath, string fragmentPath, List<VertexAttributeDescriptor> _vertexAttributesDescriptors)
 		{
+			vertexAttributesDescriptors = _vertexAttributesDescriptors;
+
 			// Read shaders codes from files
 			string vertexShaderSource = File.ReadAllText(System.IO.Path.Join(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), vertexPath));
 			string fragmentShaderSource = File.ReadAllText(System.IO.Path.Join(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), fragmentPath));

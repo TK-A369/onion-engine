@@ -11,5 +11,7 @@ namespace OnionEngine.Graphics
 		public string vertexPath = "";
 		[PrototypeParameter(true)]
 		public string fragmentPath = "";
+		[PrototypeParameter(true)]
+		public List<VertexAttributeDescriptor> vertexAttributeDescriptors = new();
 	}
 }

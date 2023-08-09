@@ -6,14 +6,14 @@ namespace OnionEngine.UserInterface
 {
 	public class Frame : Control
 	{
-		[Dependency]
-		private Window window = default!;
-
 		public ColorRGBA borderColor = new(0.5f, 0.5f, 0.5f, 0.8f);
 
 		public int borderWidth = 2;
 
 		public ColorRGBA backgroundColor = new(0.2f, 0.2f, 0.2f, 0.5f);
+
+		[Dependency]
+		private Window window = default!;
 
 		public override List<RenderData> RenderThis()
 		{

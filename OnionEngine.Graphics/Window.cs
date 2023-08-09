@@ -163,7 +163,7 @@ namespace OnionEngine.Graphics
 			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<ShaderPrototype>())
 			{
 				shaders.Add(
-					prototype.name, new Shader(prototype.vertexPath, prototype.fragmentPath));
+					prototype.name, new Shader(prototype.vertexPath, prototype.fragmentPath, prototype.vertexAttributeDescriptors));
 			}
 
 			// Create render groups based on prototypes
@@ -171,7 +171,6 @@ namespace OnionEngine.Graphics
 			{
 				renderGroups.Add(prototype.name, new RenderGroup(
 					shaders[prototype.shaderName],
-					prototype.vertexAttributeDescriptors,
 					prototype.textureAtlasName));
 			}
 

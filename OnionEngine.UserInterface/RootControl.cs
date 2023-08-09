@@ -6,9 +6,6 @@ namespace OnionEngine.UserInterface
 {
 	public class RootControl : Control
 	{
-		[Dependency]
-		private Window window = default!;
-
 		public override UIDim2 Position
 		{
 			get { return position; }
@@ -22,6 +19,9 @@ namespace OnionEngine.UserInterface
 		}
 
 		public override Vec2<int> SizeAbsolute { get => new(window.width, window.height); }
+
+		[Dependency]
+		private Window window = default!;
 
 		public override List<RenderData> RenderThis()
 		{

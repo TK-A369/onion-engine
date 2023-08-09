@@ -65,11 +65,6 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public Shader shader;
 
-		/// <summary>
-		/// List of vertex attributes descriptors
-		/// </summary>
-		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new();
-
 		public string? textureAtlasName = null;
 
 		/// <summary>
@@ -90,12 +85,11 @@ namespace OnionEngine.Graphics
 		[Dependency]
 		private Window window = default!;
 
-		public RenderGroup(Shader _shader, List<VertexAttributeDescriptor> _vertexAttributesDescriptors, string? _textureAtlasName = null)
+		public RenderGroup(Shader _shader, string? _textureAtlasName = null)
 		{
 			IoCManager.InjectDependencies(this);
 
 			shader = _shader;
-			vertexAttributesDescriptors = _vertexAttributesDescriptors;
 			textureAtlasName = _textureAtlasName;
 
 			// Generate OpenGL buffers
@@ -110,7 +104,7 @@ namespace OnionEngine.Graphics
 			// Firstly, calculate sizes of attributes
 			int totalAttributesSizePerVertex = 0;
 			List<int> attributesSizes = new();
-			foreach (VertexAttributeDescriptor desc in vertexAttributesDescriptors)
+			foreach (VertexAttributeDescriptor desc in shader.vertexAttributesDescriptors)
 			{
 				int attributeSize = 0;
 				switch (desc.type)
@@ -140,7 +134,7 @@ namespace OnionEngine.Graphics
 			// Then write those values to VAO
 			int i = 0;
 			int attributesSizeUntilNow = 0;
-			foreach (VertexAttributeDescriptor desc in vertexAttributesDescriptors)
+			foreach (VertexAttributeDescriptor desc in shader.vertexAttributesDescriptors)
 			{
 				GL.VertexAttribPointer(i, desc.valuesCount, desc.type, desc.normalized, totalAttributesSizePerVertex, attributesSizeUntilNow);
 				GL.EnableVertexAttribArray(i);
