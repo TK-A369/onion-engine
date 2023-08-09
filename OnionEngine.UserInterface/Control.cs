@@ -1,5 +1,6 @@
 using OnionEngine.DataTypes;
 using OnionEngine.Graphics;
+using OnionEngine.IoC;
 
 namespace OnionEngine.UserInterface
 {
@@ -16,28 +17,42 @@ namespace OnionEngine.UserInterface
 		/// <summary>
 		/// List of children of this control.
 		/// </summary>
-		public List<Control> children = new List<Control>();
+		public List<Control> children = new();
 
-		protected UIDim2 position = new UIDim2(0, 0, 0, 0);
+		protected UIDim2 position = new(0, 0, 0, 0);
 		/// <summary>
 		/// Position of this control inside its parent.
 		/// </summary>
 		public virtual UIDim2 Position
 		{
-			get { return position; }
+			get => position;
 			set
 			{
 				position = value;
-				// TODO: Check dimensions of parent
-				positionAbsolute = position.Calculate(100, 100);
+				positionAbsoluteLocal = position.Calculate((parent ?? throw new Exception("Couldn't calculate size of parentless control")).sizeAbsolute.x, parent.sizeAbsolute.y);
+				positionAbsoluteGlobal = positionAbsoluteLocal + parent.positionAbsoluteGlobal;
 			}
 		}
-		public Vec2<int> positionAbsolute;
+
+		public Vec2<int> positionAbsoluteLocal;
+		public Vec2<int> positionAbsoluteGlobal;
 
 		/// <summary>
 		/// Size of this control.
 		/// </summary>
-		public UIDim2 Size = new UIDim2(0, 0, 0, 0);
+		protected UIDim2 size = new(0, 0, 0, 0);
+		public virtual UIDim2 Size
+		{
+			get => size;
+			set
+			{
+				size = value;
+				sizeAbsolute = size.Calculate((parent ?? throw new Exception("Couldn't calculate size of parentless control")).sizeAbsolute.x, parent.sizeAbsolute.y);
+			}
+		}
+
+		protected Vec2<int> sizeAbsolute;
+		public virtual Vec2<int> SizeAbsolute { get => sizeAbsolute; }
 
 		/// <summary>
 		/// Generate render data.
@@ -47,7 +62,7 @@ namespace OnionEngine.UserInterface
 
 		public List<RenderData> Render()
 		{
-			List<RenderData> result = new List<RenderData>();
+			List<RenderData> result = new();
 
 			// Render itself
 			result.AddRange(RenderThis());

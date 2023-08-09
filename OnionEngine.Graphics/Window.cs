@@ -213,8 +213,8 @@ namespace OnionEngine.Graphics
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			// renderGroups["basic-group"].vertices[18] += (float)e.Time * 0.025f;
-			// renderGroups["basic-group"].vertices[19] += (float)e.Time * 0.05f;
+			// renderGroups["render-group-basic"].vertices[18] += (float)e.Time * 0.025f;
+			// renderGroups["render-group-basic"].vertices[19] += (float)e.Time * 0.05f;
 
 			updateFrameEvent.Fire(null);
 

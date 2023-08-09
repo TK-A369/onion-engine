@@ -68,7 +68,7 @@ namespace OnionEngine.Graphics
 						positionSEGlobalMat.Element(0, 0), positionSEGlobalMat.Element(1, 0), 0, 1, 1, 0, 1, texCoordsSEMat.Element(0, 0), texCoordsSEMat.Element(0, 1),
 					},
 					indices = new List<int>() { 0, 1, 2, 0, 2, 3 },
-					renderGroup = "textured-group"
+					renderGroup = "render-group-textured"
 				};
 
 				renderComponent.renderData.Add(renderData);
