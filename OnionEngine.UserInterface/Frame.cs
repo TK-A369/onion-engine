@@ -1,10 +1,12 @@
 using OnionEngine.Graphics;
 using OnionEngine.DataTypes;
+using OnionEngine.IoC;
 
 namespace OnionEngine.UserInterface
 {
 	public class Frame : Control
 	{
+		[Dependency]
 		private Window window = default!;
 
 		public ColorRGBA borderColor = new(0.5f, 0.5f, 0.5f, 0.8f);

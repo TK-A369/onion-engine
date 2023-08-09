@@ -16,7 +16,7 @@ namespace OnionEngine.DataTypes
 			y = _y;
 		}
 
-		public Mat<T> ToMatVertical()
+		public readonly Mat<T> ToMatVertical()
 		{
 			Mat<T> mat = new(3, 1);
 			mat.Element(0, 0) = x;
@@ -25,7 +25,7 @@ namespace OnionEngine.DataTypes
 			return mat;
 		}
 
-		public Mat<T> ToMatTransform()
+		public readonly Mat<T> ToMatTransform()
 		{
 			Mat<T> mat = new(3, 3);
 			mat.Element(0, 0) = (T)(dynamic)1.0;

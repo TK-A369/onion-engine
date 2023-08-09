@@ -13,7 +13,7 @@ namespace OnionEngine.UserInterface
 			relativePercent = _relativePercent;
 		}
 
-		public int Calculate(int containerSize)
+		public readonly int Calculate(int containerSize)
 		{
 			return (int)(absolutePx + (relativePercent * containerSize));
 		}
