@@ -7,7 +7,7 @@ namespace OnionEngine.UserInterface
 	[EntitySystem]
 	public sealed class UserInterfaceRendererEntitySystem : EntitySystem
 	{
-		private Action<object?>? drawSpriteSubscriber;
+		private EventSubscriber<object?>? drawSpriteSubscriber;
 
 		[EntitySystemDependency]
 		private RenderComponent renderComponent = default!;
@@ -25,8 +25,11 @@ namespace OnionEngine.UserInterface
 			drawSpriteSubscriber = (_) =>
 			{
 				renderComponent.renderData.AddRange(userInterfaceComponent.uiRootControl.Render());
+
+				Console.WriteLine("Rendering UI...");
+				Console.WriteLine(string.Join("), ", from elem in renderComponent.renderData select (elem.renderGroup + ": (" + string.Join(", ", elem.vertices))) + ")");
 			};
-			window.drawSpritesEvent.RegisterSubscriber(new EventSubscriber<object?>(drawSpriteSubscriber));
+			window.drawSpritesEvent.RegisterSubscriber(drawSpriteSubscriber);
 		}
 	}
 }

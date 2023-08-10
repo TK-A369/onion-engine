@@ -10,7 +10,7 @@ namespace OnionEngine.Graphics
 	{
 		private Mat<float> textureTransform = new(3, 3);
 
-		private Action<object?>? drawSpriteSubscriber;
+		private EventSubscriber<object?>? drawSpriteSubscriber;
 
 		[EntitySystemDependency]
 		private SpriteComponent spriteComponent = default!;
@@ -74,8 +74,10 @@ namespace OnionEngine.Graphics
 				};
 
 				renderComponent.renderData.Add(renderData);
+
+				Console.WriteLine("Rendering sprite...");
 			};
-			window.drawSpritesEvent.RegisterSubscriber(new EventSubscriber<object?>(drawSpriteSubscriber));
+			window.drawSpritesEvent.RegisterSubscriber(drawSpriteSubscriber);
 		}
 	}
 }

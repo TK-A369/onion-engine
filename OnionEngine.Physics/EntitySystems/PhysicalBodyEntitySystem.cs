@@ -10,18 +10,21 @@ namespace OnionEngine.Physics
 	[EntitySystem]
 	public class PhysicalBodyEntitySystem : EntitySystem
 	{
-		[EntitySystemDependency]
-		PositionComponent positionComponent = default!;
+		private EventSubscriber<object?>? updateFrameSubscriber;
 
 		[EntitySystemDependency]
-		PhysicalBodyComponent physicalBodyComponent = default!;
+		private PositionComponent positionComponent = default!;
+
+		[EntitySystemDependency]
+		private PhysicalBodyComponent physicalBodyComponent = default!;
 
 		[Dependency]
-		Window window = default!;
+		private Window window = default!;
 
 		public override void OnCreate()
 		{
-			window.updateFrameEvent.RegisterSubscriber(OnUpdateFrame);
+			updateFrameSubscriber = OnUpdateFrame;
+			window.updateFrameEvent.RegisterSubscriber(updateFrameSubscriber);
 
 			base.OnCreate();
 		}

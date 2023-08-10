@@ -10,18 +10,21 @@ namespace OnionEngine.Physics
 	[EntitySystem]
 	public class RigidBodyEntitySystem : EntitySystem
 	{
-		[EntitySystemDependency]
-		RotationComponent rotationComponent = default!;
+		private EventSubscriber<object?>? updateFrameSubscriber;
 
 		[EntitySystemDependency]
-		RigidBodyComponent rigidBodyComponent = default!;
+		private RotationComponent rotationComponent = default!;
+
+		[EntitySystemDependency]
+		private RigidBodyComponent rigidBodyComponent = default!;
 
 		[Dependency]
-		Window window = default!;
+		private Window window = default!;
 
 		public override void OnCreate()
 		{
-			window.updateFrameEvent.RegisterSubscriber(OnUpdateFrame);
+			updateFrameSubscriber = OnUpdateFrame;
+			window.updateFrameEvent.RegisterSubscriber(updateFrameSubscriber);
 
 			base.OnCreate();
 		}
@@ -29,6 +32,10 @@ namespace OnionEngine.Physics
 		public void OnUpdateFrame(object? _)
 		{
 			rotationComponent.rotation += rigidBodyComponent.angularVelocity;
+			if (rotationComponent.rotation > 2 * Math.PI)
+				rotationComponent.rotation -= 2 * Math.PI;
+			if (rotationComponent.rotation < 0)
+				rotationComponent.rotation += 2 * Math.PI;
 		}
 	}
 }

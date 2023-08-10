@@ -2,11 +2,11 @@ namespace OnionEngine.Core
 {
 	public class Event<TArg>
 	{
-		HashSet<WeakReference> subscribers = new HashSet<WeakReference>();
+		private HashSet<WeakReference> subscribers = new();
 
 		public void Fire(TArg arg)
 		{
-			HashSet<WeakReference> toBeDeleted = new HashSet<WeakReference>();
+			HashSet<WeakReference> toBeDeleted = new();
 			foreach (WeakReference subscriberWeakRef in subscribers)
 			{
 				if (subscriberWeakRef.IsAlive)
@@ -23,6 +23,7 @@ namespace OnionEngine.Core
 			foreach (WeakReference toBeDeletedWeakRef in toBeDeleted)
 			{
 				Console.WriteLine("Removing event subscriber");
+				Console.WriteLine(toBeDeletedWeakRef.Target);
 				subscribers.Remove(toBeDeletedWeakRef);
 			}
 		}
