@@ -34,13 +34,11 @@ namespace OnionEngine.UserInterface
 			relativePercentY = _relativePercentY;
 		}
 
-		public Vec2<int> Calculate(int containerSizeX, int containerSizeY)
+		public readonly Vec2<int> Calculate(int containerSizeX, int containerSizeY)
 		{
-			return new Vec2<int>()
-			{
-				x = (int)(absolutePxX + (relativePercentX * containerSizeX)),
-				y = (int)(absolutePxY + (relativePercentY * containerSizeY))
-			};
+			return new Vec2<int>(
+				(int)(absolutePxX + (relativePercentX * containerSizeX)),
+				(int)(absolutePxY + (relativePercentY * containerSizeY)));
 		}
 	}
 }

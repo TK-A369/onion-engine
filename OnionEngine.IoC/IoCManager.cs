@@ -104,12 +104,12 @@ namespace OnionEngine.IoC
 		/// <param name="injectDependencies">If true, dependencies will be injected</param>
 		/// <returns>Instance with dependencies injected</returns>
 		/// <exception cref="Exception">When couldn't create instance, or dependency hasn't been found</exception>
-		public static T CreateInstance<T>(object[] args, bool injectDependencies = true) where T : class
+		public static T CreateInstance<T>(object?[] args, bool injectDependencies = true) where T : class
 		{
 			return (T)CreateInstance(typeof(T), args, injectDependencies);
 		}
 
-		public static object CreateInstance(Type type, object[] args, bool injectDependencies = true)
+		public static object CreateInstance(Type type, object?[] args, bool injectDependencies = true)
 		{
 			// Create instance
 			object instance = Activator.CreateInstance(type, args) ??

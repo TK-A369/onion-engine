@@ -164,9 +164,9 @@ namespace OnionEngine.Graphics
 			// Create render groups based on prototypes
 			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<RenderGroupPrototype>())
 			{
-				renderGroups.Add(prototype.name, new RenderGroup(
+				renderGroups.Add(prototype.name, IoCManager.CreateInstance<RenderGroup>(new object?[] {
 					shaders[prototype.shaderName],
-					prototype.textureAtlasName));
+					prototype.textureAtlasName }));
 			}
 
 			float[] vertexData =

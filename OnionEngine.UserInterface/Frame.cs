@@ -25,7 +25,7 @@ namespace OnionEngine.UserInterface
 			// throw new NotImplementedException();
 
 			Vec2<float> toDeviceNormalisedCoordinates(Vec2<int> coords)
-				=> new((((float)coords.x) / window.width * 2) - 1, (((float)coords.y) / window.height * 2) - 1);
+				=> new((((float)coords.x) / window.width * 2.0f) - 1.0f, (((float)coords.y) / window.height * 2.0f) - 1.0f);
 
 			Vec2<float>[] verticesCoords = new Vec2<float>[4] {
 				toDeviceNormalisedCoordinates(positionAbsoluteGlobal),
@@ -33,6 +33,8 @@ namespace OnionEngine.UserInterface
 				toDeviceNormalisedCoordinates(positionAbsoluteGlobal + SizeAbsolute),
 				toDeviceNormalisedCoordinates(positionAbsoluteGlobal + new Vec2<int>(0, SizeAbsolute.y))
 			};
+
+			Console.WriteLine("Window size: " + window.width + ", " + window.height);
 
 			return new List<RenderData>()
 			{

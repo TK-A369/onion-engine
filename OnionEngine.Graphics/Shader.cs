@@ -16,6 +16,8 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public List<VertexAttributeDescriptor> vertexAttributesDescriptors = new();
 
+		public readonly int vertexDescriptorSize = 0;
+
 		private int handle;
 
 		private bool disposedValue = false;
@@ -72,6 +74,9 @@ namespace OnionEngine.Graphics
 			GL.DetachShader(handle, fragmentShader);
 			GL.DeleteShader(fragmentShader);
 			GL.DeleteShader(vertexShader);
+
+			foreach (VertexAttributeDescriptor desc in vertexAttributesDescriptors)
+				vertexDescriptorSize += desc.valuesCount;
 		}
 
 		protected virtual void Dispose(bool disposing)

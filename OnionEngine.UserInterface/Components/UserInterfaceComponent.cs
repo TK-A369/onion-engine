@@ -8,6 +8,6 @@ namespace OnionEngine.UserInterface
 	/// </summary>
 	public sealed class UserInterfaceComponent : Component
 	{
-		public RootControl uiRootControl = new();
+		public RootControl? uiRootControl;
 	}
 }

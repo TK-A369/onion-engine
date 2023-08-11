@@ -183,8 +183,6 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public void Render(OffscreenRenderTarget? offscreenRenderTarget = null)
 		{
-			Bind();
-
 			if (offscreenRenderTarget != null)
 			{
 				offscreenRenderTarget.Bind();
@@ -195,6 +193,8 @@ namespace OnionEngine.Graphics
 				GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 				GL.Viewport(0, 0, window.width, window.height);
 			}
+
+			Bind();
 
 			if (textureAtlasName != null)
 				window.textureAtlases[textureAtlasName].Use();

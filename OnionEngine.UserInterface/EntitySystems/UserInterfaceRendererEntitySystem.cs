@@ -24,10 +24,13 @@ namespace OnionEngine.UserInterface
 
 			drawSpriteSubscriber = (_) =>
 			{
-				renderComponent.renderData.AddRange(userInterfaceComponent.uiRootControl.Render());
+				if (userInterfaceComponent.uiRootControl != null)
+				{
+					renderComponent.renderData.AddRange(userInterfaceComponent.uiRootControl.Render());
 
-				Console.WriteLine("Rendering UI...");
-				Console.WriteLine(string.Join("), ", from elem in renderComponent.renderData select (elem.renderGroup + ": (" + string.Join(", ", elem.vertices))) + ")");
+					Console.WriteLine("Rendering UI...");
+					Console.WriteLine(string.Join("), ", from elem in renderComponent.renderData select (elem.renderGroup + ": (" + string.Join(", ", elem.vertices))) + ")");
+				}
 			};
 			window.drawSpritesEvent.RegisterSubscriber(drawSpriteSubscriber);
 		}
