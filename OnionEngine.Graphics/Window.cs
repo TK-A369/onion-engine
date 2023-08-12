@@ -165,8 +165,7 @@ namespace OnionEngine.Graphics
 			foreach (var (_, prototype) in prototypeManager.GetPrototypesOfType<RenderGroupPrototype>())
 			{
 				renderGroups.Add(prototype.name, IoCManager.CreateInstance<RenderGroup>(new object?[] {
-					shaders[prototype.shaderName],
-					prototype.textureAtlasName }));
+					shaders[prototype.shaderName] }));
 			}
 
 			float[] vertexData =
@@ -220,6 +219,36 @@ namespace OnionEngine.Graphics
 			renderCallback?.Invoke();
 
 			base.OnRenderFrame(args);
+		}
+
+		public List<RenderData> OptimizeRenderDataList(List<RenderData> renderDataList)
+		{
+			Dictionary<(string, string?), RenderData> renderDataDictionary = new();
+
+			foreach (RenderData renderData in renderDataList)
+			{
+				(string, string?) groupAndAtlasName = (renderData.renderGroup, renderData.textureAtlasName);
+				if (!renderDataDictionary.ContainsKey(groupAndAtlasName))
+				{
+					renderDataDictionary[groupAndAtlasName] = new()
+					{
+						vertices = new(),
+						indices = new(),
+						renderGroup = renderData.renderGroup,
+						textureAtlasName = renderData.textureAtlasName
+					};
+				}
+
+				int indexOffset = renderDataDictionary[groupAndAtlasName].vertices.Count
+					/ renderGroups[renderData.renderGroup].shader.vertexDescriptorSize;
+				renderDataDictionary[groupAndAtlasName].vertices.AddRange(renderData.vertices);
+				foreach (int index in renderData.indices)
+				{
+					renderDataDictionary[groupAndAtlasName].indices.Add(index + indexOffset);
+				}
+			}
+
+			return renderDataDictionary.Values.ToList();
 		}
 	}
 }

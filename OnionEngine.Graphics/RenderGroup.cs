@@ -7,18 +7,6 @@ using OpenTK.Graphics.OpenGL4;
 namespace OnionEngine.Graphics
 {
 	/// <summary>
-	/// Struct storing some data to render.
-	/// It has list of vertices, and the order to draw them.
-	/// It belongs to given render group.
-	/// </summary>
-	public struct RenderData
-	{
-		public List<float> vertices;
-		public List<int> indices;
-		public string renderGroup;
-	}
-
-	/// <summary>
 	/// Struct describing vertex attributes.
 	/// For example position is usually float*3 or float*2.
 	/// </summary>
@@ -65,32 +53,19 @@ namespace OnionEngine.Graphics
 		/// </summary>
 		public Shader shader;
 
-		public string? textureAtlasName = null;
-
 		/// <summary>
 		/// If OpenGL buffers were disposed
 		/// </summary>
 		private bool disposed = false;
 
-		/// <summary>
-		/// Vertices data to be rendered
-		/// </summary>
-		public List<float> vertices = new();
-
-		/// <summary>
-		/// Order of vertices
-		/// </summary>
-		public List<int> indices = new();
-
 		[Dependency]
 		private Window window = default!;
 
-		public RenderGroup(Shader _shader, string? _textureAtlasName = null)
+		public RenderGroup(Shader _shader)
 		{
 			IoCManager.InjectDependencies(this);
 
 			shader = _shader;
-			textureAtlasName = _textureAtlasName;
 
 			// Generate OpenGL buffers
 			vertexArrayObject = GL.GenVertexArray();
@@ -181,7 +156,7 @@ namespace OnionEngine.Graphics
 		/// <summary>
 		/// Render image, based on <c>vertives</c>, <c>indices</c> and <c>shader</c>.
 		/// </summary>
-		public void Render(OffscreenRenderTarget? offscreenRenderTarget = null)
+		public void Render(RenderData renderData, OffscreenRenderTarget? offscreenRenderTarget = null)
 		{
 			if (offscreenRenderTarget != null)
 			{
@@ -196,14 +171,14 @@ namespace OnionEngine.Graphics
 
 			Bind();
 
-			if (textureAtlasName != null)
-				window.textureAtlases[textureAtlasName].Use();
+			if (renderData.textureAtlasName != null)
+				window.textureAtlases[renderData.textureAtlasName].Use();
 
-			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), BufferUsageHint.StreamDraw);
-			GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.StreamDraw);
+			GL.BufferData(BufferTarget.ArrayBuffer, renderData.vertices.Count * sizeof(float), renderData.vertices.ToArray(), BufferUsageHint.StreamDraw);
+			GL.BufferData(BufferTarget.ElementArrayBuffer, renderData.indices.Count * sizeof(int), renderData.indices.ToArray(), BufferUsageHint.StreamDraw);
 			shader.Use();
 			// GL.DrawArrays(PrimitiveType.Triangles, 0, triangle.Length / 6);
-			GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
+			GL.DrawElements(PrimitiveType.Triangles, renderData.indices.Count, DrawElementsType.UnsignedInt, 0);
 		}
 	}
 }
