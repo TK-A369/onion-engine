@@ -51,7 +51,8 @@ namespace OnionEngine.Network
 
 					var (msgType, msg) = networkMessagesSerializer.Deserialize(dataStr);
 					onMessageReceived.Fire(msg);
-					Console.WriteLine("Received message of type " + msgType + ": " + msg);
+					if (GameManager.debugMode)
+						Console.WriteLine("Received message of type " + msgType + ": " + msg);
 				}
 			}
 		}

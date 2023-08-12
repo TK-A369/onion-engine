@@ -27,5 +27,11 @@ namespace OnionEngine.UserInterface
 		{
 			return new List<RenderData>() { };
 		}
+
+		public override void RecalculateDimensions()
+		{
+			foreach (Control child in children)
+				child.RecalculateDimensions();
+		}
 	}
 }

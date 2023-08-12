@@ -232,7 +232,9 @@ namespace OnionEngine.Prototypes
 					prototypesByType.Add(prototypeType, new Dictionary<string, Prototype>());
 				}
 				prototypesByType[prototypeType].Add(prototypeName, prototypeInstance);
-				Console.Write("Loaded prototype:\n" + prototypeInstance.ToString() + "\n");
+
+				if (GameManager.debugMode)
+					Console.Write("Loaded prototype:\n" + prototypeInstance.ToString() + "\n");
 			}
 		}
 
@@ -247,7 +249,9 @@ namespace OnionEngine.Prototypes
 
 			foreach (string file in Directory.EnumerateFiles(fullPath, "*.json", SearchOption.AllDirectories))
 			{
-				Console.WriteLine("Loading prototypes file " + file);
+				if (GameManager.debugMode)
+					Console.WriteLine("Loading prototypes file " + file);
+
 				LoadPrototypes(File.ReadAllText(file));
 			}
 		}

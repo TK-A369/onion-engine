@@ -102,13 +102,11 @@ namespace OnionEngine.Graphics
 						transformationMatrix.Element(2, 1) = 0.0f;
 						transformationMatrix.Element(2, 2) = 1.0f;
 						texturesTransformations[texture.Key] = transformationMatrix;
-						// Console.WriteLine("Texture transformation matrix:\n" + transformationMatrix.ToString());
 
 						freeRectangles.Remove(rectangle);
 
 						Int64 residueX = rectangle.width - image.Width;
 						Int64 residueY = rectangle.height - image.Height;
-						// Console.WriteLine("Residue: " + residueX + ", " + residueY);
 
 						if (residueX > 0)
 						{
@@ -123,11 +121,6 @@ namespace OnionEngine.Graphics
 						break;
 					}
 				}
-
-				// Console.WriteLine("Free rectangles:");
-				// foreach (Rectangle r in freeRectangles)
-				// 	Console.WriteLine(r.startX + ", " + r.startY + ", " + r.width + ", " + r.height);
-				// Console.WriteLine();
 
 				if (!foundFreeRectangle)
 				{

@@ -28,12 +28,17 @@ namespace OnionEngine.Graphics
 		public Event<object?> afterLoadEvent = new();
 
 		/// <summary>
-		/// This event is fired every frame.
+		/// This event is fired every render frame.
 		/// Appropriate entity systems should update <c>renderData</c> field of <c>RenderComponent</c> when this event is fired.
 		/// </summary>
 		public Event<object?> drawSpritesEvent = new();
 
+		/// <summary>
+		/// This event is fired every update frame.
+		/// </summary>
 		public Event<object?> updateFrameEvent = new();
+
+		public Event<object?> windowResizeEvent = new();
 
 		// OpenGL stuff
 
@@ -199,9 +204,13 @@ namespace OnionEngine.Graphics
 		protected override void OnResize(ResizeEventArgs e)
 		{
 			base.OnResize(e);
+
 			width = e.Width;
 			height = e.Height;
+
 			GL.Viewport(0, 0, e.Width, e.Height);
+
+			windowResizeEvent.Fire(null);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)

@@ -75,8 +75,8 @@ namespace OnionEngine.UserInterface
 				result.AddRange(child.Render());
 			}
 
-			Console.WriteLine("UI render data:");
-			Console.WriteLine("(" + string.Join("), (", from elem in result select (string.Join(", ", elem.vertices))) + ")");
+			// Console.WriteLine("UI render data:");
+			// Console.WriteLine("(" + string.Join("), (", from elem in result select (string.Join(", ", elem.vertices))) + ")");
 
 			return result;
 		}
@@ -85,6 +85,15 @@ namespace OnionEngine.UserInterface
 		{
 			children.Add(child);
 			child.parent = this;
+		}
+
+		public virtual void RecalculateDimensions()
+		{
+			Size = Size;
+			Position = Position;
+
+			foreach (Control child in children)
+				child.RecalculateDimensions();
 		}
 	}
 }

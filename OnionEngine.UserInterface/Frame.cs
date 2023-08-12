@@ -34,8 +34,6 @@ namespace OnionEngine.UserInterface
 				toDeviceNormalisedCoordinates(positionAbsoluteGlobal + new Vec2<int>(0, SizeAbsolute.y))
 			};
 
-			Console.WriteLine("Window size: " + window.width + ", " + window.height);
-
 			return new List<RenderData>()
 			{
 				new RenderData() {

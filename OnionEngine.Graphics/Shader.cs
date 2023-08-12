@@ -27,11 +27,12 @@ namespace OnionEngine.Graphics
 			vertexAttributesDescriptors = _vertexAttributesDescriptors;
 
 			// Read shaders codes from files
-			string vertexShaderSource = File.ReadAllText(System.IO.Path.Join(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), vertexPath));
-			string fragmentShaderSource = File.ReadAllText(System.IO.Path.Join(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), fragmentPath));
-
-			// Console.WriteLine("Vertex shader source:\n" + vertexShaderSource);
-			// Console.WriteLine("Fragment shader source:\n" + fragmentShaderSource);
+			string vertexShaderSource = File.ReadAllText(System.IO.Path.Join(
+				System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location),
+				vertexPath));
+			string fragmentShaderSource = File.ReadAllText(System.IO.Path.Join(
+				System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location),
+				fragmentPath));
 
 			// Create shaders
 			int vertexShader = GL.CreateShader(ShaderType.VertexShader);

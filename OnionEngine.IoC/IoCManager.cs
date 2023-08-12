@@ -60,9 +60,7 @@ namespace OnionEngine.IoC
 			instances[asType] = new WeakReference(instance);
 
 			if (GameManager.debugMode)
-			{
 				Console.WriteLine("Registered instance of " + typeof(T).FullName + " as " + asType.FullName);
-			}
 		}
 
 		/// <summary>
@@ -86,11 +84,13 @@ namespace OnionEngine.IoC
 			{
 				if (fieldInfo.IsDefined(typeof(DependencyAttribute)))
 				{
-					fieldInfo.SetValue(instance, GetInstanceOfType(fieldInfo.FieldType) ?? throw new Exception("Couldn't find instance of type " + fieldInfo.FieldType.FullName));
-					Console.WriteLine(
-						"Dependency " + fieldInfo.FieldType.FullName +
-						" injected to field " + fieldInfo.Name +
-						" in instance of type " + instance.GetType().FullName);
+					fieldInfo.SetValue(instance, GetInstanceOfType(fieldInfo.FieldType)
+						?? throw new Exception("Couldn't find instance of type " + fieldInfo.FieldType.FullName));
+					if (GameManager.debugMode)
+						Console.WriteLine(
+							"Dependency " + fieldInfo.FieldType.FullName +
+							" injected to field " + fieldInfo.Name +
+							" in instance of type " + instance.GetType().FullName);
 				}
 			}
 		}

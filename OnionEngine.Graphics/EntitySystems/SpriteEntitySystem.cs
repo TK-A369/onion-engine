@@ -75,8 +75,6 @@ namespace OnionEngine.Graphics
 				};
 
 				renderComponent.renderData.Add(renderData);
-
-				Console.WriteLine("Rendering sprite...");
 			};
 			window.drawSpritesEvent.RegisterSubscriber(drawSpriteSubscriber);
 		}
