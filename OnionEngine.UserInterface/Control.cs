@@ -34,8 +34,8 @@ namespace OnionEngine.UserInterface
 			}
 		}
 
-		public Vec2<int> positionAbsoluteLocal;
-		public Vec2<int> positionAbsoluteGlobal;
+		public Vec2<int> positionAbsoluteLocal = new(0, 0);
+		public Vec2<int> positionAbsoluteGlobal = new(0, 0);
 
 		/// <summary>
 		/// Size of this control.
