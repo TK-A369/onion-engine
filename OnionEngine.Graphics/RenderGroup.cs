@@ -23,6 +23,11 @@ namespace OnionEngine.Graphics
 		public VertexAttributeDescriptor() { }
 	}
 
+	public class RenderHooks
+	{
+		public Action? bindTextures = null;
+	}
+
 	/// <summary>
 	/// Render group, which has given list of vertex attributes, and uses given shader.
 	/// </summary>
@@ -156,8 +161,10 @@ namespace OnionEngine.Graphics
 		/// <summary>
 		/// Render image, based on <c>vertives</c>, <c>indices</c> and <c>shader</c>.
 		/// </summary>
-		public void Render(RenderData renderData, OffscreenRenderTarget? offscreenRenderTarget = null)
+		public void Render(RenderData renderData, OffscreenRenderTarget? offscreenRenderTarget = null, RenderHooks? renderHooks = null)
 		{
+			renderHooks ??= new();
+
 			if (offscreenRenderTarget != null)
 			{
 				offscreenRenderTarget.Bind();
@@ -171,8 +178,15 @@ namespace OnionEngine.Graphics
 
 			Bind();
 
-			if (renderData.textureAtlasName != null)
-				window.textureAtlases[renderData.textureAtlasName].Use();
+			if (renderHooks.bindTextures != null)
+			{
+				renderHooks.bindTextures();
+			}
+			else
+			{
+				if (renderData.textureAtlasName != null)
+					window.textureAtlases[renderData.textureAtlasName].Use();
+			}
 
 			GL.BufferData(BufferTarget.ArrayBuffer, renderData.vertices.Count * sizeof(float), renderData.vertices.ToArray(), BufferUsageHint.StreamDraw);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, renderData.indices.Count * sizeof(int), renderData.indices.ToArray(), BufferUsageHint.StreamDraw);
