@@ -373,5 +373,11 @@ namespace OnionEngine.Core
 			foreach (Type entitySystemType in entitySystemTypes)
 				RegisterEntitySystemType(entitySystemType);
 		}
+
+		public EntitySystem GetEntitySystem(Int64 entity, Type entitySystemType)
+			=> entitySystemsByParent[entity][entitySystemType];
+
+		public T GetEntitySystem<T>(Int64 entity) where T : EntitySystem
+			=> (T)GetEntitySystem(entity, typeof(T));
 	}
 }

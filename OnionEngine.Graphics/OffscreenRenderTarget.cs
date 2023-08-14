@@ -70,10 +70,10 @@ namespace OnionEngine.Graphics
 			GL.Viewport(0, 0, width, height);
 		}
 
-		public void Clear()
+		public void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f)
 		{
 			Bind();
-			GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			GL.ClearColor(r, g, b, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 		}
 

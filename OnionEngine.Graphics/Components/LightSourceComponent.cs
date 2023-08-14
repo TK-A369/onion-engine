@@ -14,5 +14,9 @@ namespace OnionEngine.Graphics
 		public string lightmapTextureName = "";
 
 		public ColorRGB lightColor = new(1, 1, 1);
+
+		public float size = 1.0f;
+
+		public RenderData renderData = new();
 	}
 }
