@@ -18,11 +18,6 @@ namespace OnionEngine.Prototypes
 		/// </summary>
 		public Dictionary<string, EntityGroupPrototype> entityGroupPrototypes = new();
 
-		/// <summary>
-		/// Dictionary of entity prototypes by their names.
-		/// </summary>
-		public Dictionary<string, EntityPrototype> entityPrototypes = new();
-
 		public Dictionary<string, Prototype> prototypes = new();
 
 		private Dictionary<Type, Dictionary<string, Prototype>> prototypesByType = new();
@@ -265,7 +260,7 @@ namespace OnionEngine.Prototypes
 		/// <remarks>Should be moved into more appropriate place</remarks>
 		public Int64 SpawnEntityPrototype(string prototypeName)
 		{
-			EntityPrototype prototype = entityPrototypes[prototypeName];
+			EntityPrototype prototype = (EntityPrototype)prototypesByType[typeof(EntityPrototype)][prototypeName];
 
 			// Create entity
 			Int64 entityId = gameManager.AddEntity(prototype.name);
@@ -277,11 +272,6 @@ namespace OnionEngine.Prototypes
 				{
 					Component component = gameManager.CreateComponentByTypeName(componentPrototype.type, new object[] { });
 					Type componentType = component.GetType();
-					if (!gameManager.HasComponent(entityId, componentType))
-					{
-						component.entityId = entityId;
-						gameManager.AddComponent(component);
-					}
 
 					// Assign values to component's fields
 					foreach (KeyValuePair<string, ComponentProperty> property in componentPrototype.properties)
@@ -289,12 +279,19 @@ namespace OnionEngine.Prototypes
 						FieldInfo fieldInfo = componentType.GetField(property.Key) ?? throw new Exception("Field " + property.Key + " not found in component type " + componentType.Name);
 						fieldInfo.SetValue(component, property.Value.value);
 					}
+
+					// Add component to entity
+					if (!gameManager.HasComponent(entityId, componentType))
+					{
+						component.entityId = entityId;
+						gameManager.AddComponent(component);
+					}
 				}
 
 				// Recursively call for parent prototypes
 				foreach (string parent in entityPrototype.inheritFrom)
 				{
-					AddComponents(entityPrototypes[parent], entityId);
+					AddComponents((EntityPrototype)prototypesByType[typeof(EntityPrototype)][parent], entityId);
 				}
 			}
 			AddComponents(prototype, entityId);

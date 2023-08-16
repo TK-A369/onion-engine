@@ -1,4 +1,5 @@
 using System.Numerics;
+using OnionEngine.Prototypes;
 
 namespace OnionEngine.DataTypes
 {
@@ -6,9 +7,14 @@ namespace OnionEngine.DataTypes
 	/// Vector of two values.
 	/// </summary>
 	/// <typeparam name="T">Type of values, typically <c>int</c>, <c>float</c> or <c>double</c></typeparam>
+	[PrototypeJSONAutoparse]
 	public struct Vec2<T> where T : INumber<T>
 	{
-		public T x, y;
+		[PrototypeJSONAutoparsedField(true)]
+		public T x;
+
+		[PrototypeJSONAutoparsedField(true)]
+		public T y;
 
 		public Vec2(T _x, T _y)
 		{

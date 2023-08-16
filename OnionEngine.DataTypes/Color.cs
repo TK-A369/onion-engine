@@ -1,8 +1,18 @@
+using OnionEngine.Prototypes;
+
 namespace OnionEngine.DataTypes
 {
+	[PrototypeJSONAutoparse]
 	public struct ColorRGB
 	{
-		public float r, g, b;
+		[PrototypeJSONAutoparsedField(true)]
+		public float r;
+
+		[PrototypeJSONAutoparsedField(true)]
+		public float g;
+
+		[PrototypeJSONAutoparsedField(true)]
+		public float b;
 
 		public ColorRGB(float _r, float _g, float _b)
 		{
