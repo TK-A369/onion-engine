@@ -47,5 +47,19 @@ namespace OnionEngine.DataTypes
 		}
 
 		public static Vec2<T> operator +(Vec2<T> a, Vec2<T> b) => new(a.x + b.x, a.y + b.y);
+
+		public static Vec2<T> operator -(Vec2<T> a, Vec2<T> b) => new(a.x - b.x, a.y - b.y);
+
+		public static Vec2<T> operator *(Vec2<T> a, T b) => new(a.x * b, a.y * b);
+
+		public readonly Vec2<T2> Cast<T2>() where T2 : INumber<T2>
+			=> new((T2)(dynamic)x, (T2)(dynamic)y);
+
+		public readonly Vec2<T> Normalize()
+		{
+			double magnitude = Math.Sqrt((double)(dynamic)((x * x) + (y * y)));
+
+			return this * (T)(dynamic)(1.0 / magnitude);
+		}
 	}
 }
