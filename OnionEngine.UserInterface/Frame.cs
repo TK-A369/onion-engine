@@ -22,8 +22,6 @@ namespace OnionEngine.UserInterface
 
 		public override List<RenderData> RenderThis()
 		{
-			// throw new NotImplementedException();
-
 			Vec2<float> toDeviceNormalisedCoordinates(Vec2<int> coords)
 				=> new((((float)coords.x) / window.width * 2.0f) - 1.0f, (((float)coords.y) / window.height * 2.0f) - 1.0f);
 

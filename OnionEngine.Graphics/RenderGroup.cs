@@ -184,8 +184,8 @@ namespace OnionEngine.Graphics
 			}
 			else
 			{
-				if (renderData.textureAtlasName != null)
-					window.textureAtlases[renderData.textureAtlasName].Use();
+				if (renderData.textureName != null)
+					window.textureAtlases[renderData.textureName].Use();
 			}
 
 			GL.BufferData(BufferTarget.ArrayBuffer, renderData.vertices.Count * sizeof(float), renderData.vertices.ToArray(), BufferUsageHint.StreamDraw);

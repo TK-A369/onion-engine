@@ -57,7 +57,7 @@ namespace OnionEngine.Graphics
 						positionSEGlobalMat.Element(0, 0), positionSEGlobalMat.Element(1, 0), 0, texCoordsSEMat.Element(0, 0), texCoordsSEMat.Element(0, 1),
 					},
 				indices = new List<int>() { 0, 1, 2, 0, 2, 3 },
-				textureAtlasName = "texture-atlas-lightmaps",
+				textureName = "texture-atlas-lightmaps",
 				renderGroup = "render-group-lights"
 			};
 		}

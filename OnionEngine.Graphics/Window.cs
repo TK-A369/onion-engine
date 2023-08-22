@@ -236,7 +236,7 @@ namespace OnionEngine.Graphics
 
 			foreach (RenderData renderData in renderDataList)
 			{
-				(string, string?) groupAndAtlasName = (renderData.renderGroup, renderData.textureAtlasName);
+				(string, string?) groupAndAtlasName = (renderData.renderGroup, renderData.textureName);
 				if (!renderDataDictionary.ContainsKey(groupAndAtlasName))
 				{
 					renderDataDictionary[groupAndAtlasName] = new()
@@ -244,7 +244,7 @@ namespace OnionEngine.Graphics
 						vertices = new(),
 						indices = new(),
 						renderGroup = renderData.renderGroup,
-						textureAtlasName = renderData.textureAtlasName
+						textureName = renderData.textureName
 					};
 				}
 
